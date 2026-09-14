@@ -174,3 +174,79 @@ tr.stock-alerte {
 .btn-secondary:hover {
     background-color: #334155 !important;
 }
+
+/* =========================================
+   Adaptation Mobile (écrans de smartphone)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 12px;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        padding-bottom: 5px;
+    }
+
+    form {
+        grid-template-columns: 1fr;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 5px;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: right;
+    }
+
+    td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        gap: 8px;
+        padding-top: 12px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #475569;
+        text-align: left;
+        padding-right: 10px;
+    }
+}
