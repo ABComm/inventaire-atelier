@@ -116,8 +116,8 @@ async function chargerFournisseurs() {
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${f.nom}</strong></td>
-                <td>${f.contact || 'Aucun contact'}</td>
+                <td data-label="Nom"><strong>${f.nom}</strong></td>
+                <td data-label="Contact">${f.contact || 'Aucun contact'}</td>
             `;
             tbodyFournisseurs.appendChild(tr);
         });
@@ -142,12 +142,12 @@ async function chargerPieces() {
             }
 
             tr.innerHTML = `
-                <td><strong>${piece.reference}</strong></td>
-                <td>${piece.nom}</td>
-                <td>${piece.emplacement || '-'}</td>
-                <td>${piece.fournisseur_nom || 'Aucun'}</td>
-                <td><span id="qte-${piece.id}">${piece.quantite}</span></td>
-                <td>
+                <td data-label="Référence"><strong>${piece.reference}</strong></td>
+                <td data-label="Nom">${piece.nom}</td>
+                <td data-label="Emplacement">${piece.emplacement || '-'}</td>
+                <td data-label="Fournisseur">${piece.fournisseur_nom || 'Aucun'}</td>
+                <td data-label="Quantité"><span id="qte-${piece.id}">${piece.quantite}</span></td>
+                <td data-label="Actions">
                     <button class="btn-action" onclick="modifierQuantite(${piece.id}, ${piece.quantite}, -1)">-</button>
                     <button class="btn-action" onclick="modifierQuantite(${piece.id}, ${piece.quantite}, 1)">+</button>
                     <button class="btn-suppr" onclick="supprimerPiece(${piece.id})">🗑️</button>
@@ -172,9 +172,9 @@ async function chargerMouvements() {
         mouvements.forEach(m => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="color: #64748b; font-size: 13px;">${m.date}</td>
-                <td><strong>${m.type}</strong></td>
-                <td>${m.details}</td>
+                <td data-label="Date" style="color: #64748b; font-size: 13px;">${m.date}</td>
+                <td data-label="Type"><strong>${m.type}</strong></td>
+                <td data-label="Détails">${m.details}</td>
             `;
             tbody.appendChild(tr);
         });
