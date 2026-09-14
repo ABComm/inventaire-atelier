@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventaire Atelier Méca</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1>Atelier Méca - Gestion</h1>
+            <a href="/api/export/pdf" class="btn-pdf" target="_blank">📄 Exporter Stock PDF</a>
+        </header>
+
+        <!-- Barre d'onglets -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="changerOnglet('pieces')">📦 Gestion des Pièces</button>
+            <button class="tab-btn" onclick="changerOnglet('fournisseurs')">🤝 Fournisseurs</button>
+            <button class="tab-btn" onclick="changerOnglet('traçabilite')">📋 Traçabilité</button>
+        </div>
+
+        <!-- ONGLET 1 : PIÈCES -->
+        <div id="onglet-pieces" class="tab-content active">
+            <form id="piece-form">
+                <h2>Ajouter une pièce</h2>
+                <input type="text" id="reference" placeholder="Référence (ex: FIL-123)" required>
+                <input type="text" id="nom" placeholder="Nom de la pièce" required>
+                <input type="text" id="emplacement" placeholder="Emplacement (ex: Étagère A2)">
+                <input type="number" id="quantite" placeholder="Quantité en stock" required>
+                <input type="number" id="seuil_alerte" placeholder="Seuil alerte mini">
+                <select id="fournisseur_id">
+                    <option value="">-- Choisir un fournisseur --</option>
+                </select>
+                <button type="submit">Ajouter au stock</button>
+            </form>
+
+            <h2>Stock actuel</h2>
+            <input type="text" id="search" placeholder="Rechercher une pièce par référence ou nom...">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Nom</th>
+                        <th>Emplacement</th>
+                        <th>Fournisseur</th>
+                        <th>Quantité</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pieces-list">
+                    <!-- Rempli par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ONGLET 2 : FOURNISSEURS -->
+        <div id="onglet-fournisseurs" class="tab-content">
+            <h2>Répertoire des Fournisseurs</h2>
+            <form id="fournisseur-form">
+                <input type="text" id="fournisseur-nom" placeholder="Nom du fournisseur (ex: AD, Oscaro...)" required>
+                <input type="text" id="fournisseur-contact" placeholder="Contact / Téléphone / Email">
+                <button type="submit" class="btn-secondary">Ajouter le fournisseur</button>
+            </form>
+
+            <h3>Liste des fournisseurs enregistrés</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody id="fournisseurs-list">
+                    <!-- Rempli par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ONGLET 3 : TRAÇABILITÉ -->
+        <div id="onglet-traçabilite" class="tab-content">
+            <h2>Historique des Mouvements (Journal)</h2>
+            <p style="color: #64748b; font-size: 14px;">Les 50 dernières actions effectuées dans l'atelier (entrées, sorties, ajouts, suppressions).</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Heure</th>
+                        <th>Type d'action</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody id="mouvements-list">
+                    <!-- Rempli par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
