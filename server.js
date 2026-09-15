@@ -11,6 +11,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Sécurité : Si on est en production sur Render, on s'assure que Turso est bien configuré
+if (process.env.NODE_ENV === 'production' && !process.env.TURSO_DATABASE_URL) {
+    console.error("ERREUR CRITIQUE : TURSO_DATABASE_URL est manquante sur Render ! Configure tes variables d'environnement.");
+}
+
 // Connexion à Turso (en production sur Render) ou SQLite local (sur ton PC)
 const db = createClient({
     url: process.env.TURSO_DATABASE_URL || 'file:inventaire.db',
@@ -94,6 +99,32 @@ app.post('/api/fournisseurs', async (req, res) => {
     }
 });
 
+app.delete('/api/fournisseurs/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const fournisseurResult = await db.execute({
+            sql: `SELECT nom FROM fournisseurs WHERE id = ?`,
+            args: [id]
+        });
+
+        if (fournisseurResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Fournisseur introuvable' });
+        }
+
+        const fournisseur = fournisseurResult.rows[0];
+
+        await db.execute({
+            sql: `DELETE FROM fournisseurs WHERE id = ?`,
+            args: [id]
+        });
+
+        await enregistrerMouvement('SUPPRESSION', `Suppression du fournisseur : ${fournisseur.nom}`);
+        res.json({ message: 'Fournisseur supprimé' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 // --- PIÈCES ---
 app.get('/api/pieces', async (req, res) => {
     try {
@@ -131,7 +162,6 @@ app.patch('/api/pieces/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
-        // Récupérer le nom et la référence avant modification pour l'historique
         const pieceResult = await db.execute({
             sql: `SELECT reference, nom FROM pieces WHERE id = ?`,
             args: [id]
@@ -201,7 +231,6 @@ app.get('/api/export/pdf', async (req, res) => {
     
     doc.pipe(res);
 
-    // En-tête du document
     doc.fontSize(22).fillColor('#1e293b').text('ATELIER MÉCA - ÉTAT DU STOCK', { align: 'center' });
     doc.fontSize(10).fillColor('#64748b').text(`Édité le : ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, { align: 'center' });
     doc.moveDown(1.5);
@@ -216,7 +245,6 @@ app.get('/api/export/pdf', async (req, res) => {
         const result = await db.execute(query);
         const rows = result.rows;
 
-        // En-têtes du tableau
         const startX = 40;
         let startY = doc.y;
         const colWidths = [75, 130, 80, 95, 55, 80];
@@ -236,7 +264,6 @@ app.get('/api/export/pdf', async (req, res) => {
         dessinerEntetesTableau(startY);
         startY += 25;
 
-        // Lignes du tableau
         doc.fontSize(9).fillColor('#1e293b');
         rows.forEach((p, index) => {
             if (startY > 750) {
