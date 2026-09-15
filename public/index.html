@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier Méca - Gestion de Stock</title>
+    <title>Atelier Méca - Stock</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -41,7 +41,6 @@
 
         header h1 {
             font-size: 1.4rem;
-            color: var(--text-main);
             font-weight: 700;
         }
 
@@ -50,7 +49,6 @@
             color: var(--text-muted);
         }
 
-        /* Notification Toast */
         #notification {
             display: none;
             position: fixed;
@@ -67,7 +65,6 @@
             z-index: 1000;
         }
 
-        /* Barre de recherche et actions globales */
         .actions-bar {
             display: flex;
             gap: 10px;
@@ -84,10 +81,6 @@
             outline: none;
         }
 
-        .search-input:focus {
-            border-color: var(--primary);
-        }
-
         .btn-pdf {
             background-color: #475569;
             color: white;
@@ -99,7 +92,6 @@
             font-size: 0.9rem;
         }
 
-        /* Formulaires / Cartes de saisie */
         .card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -112,7 +104,6 @@
         .card h2 {
             font-size: 1.1rem;
             margin-bottom: 12px;
-            color: var(--text-main);
         }
 
         .form-group {
@@ -151,11 +142,6 @@
             margin-top: 5px;
         }
 
-        button.btn-primary:active {
-            background: var(--primary-hover);
-        }
-
-        /* Liste des pièces en mode Cartes mobiles */
         .pieces-list {
             display: flex;
             flex-direction: column;
@@ -168,7 +154,12 @@
             padding: 15px;
             border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .piece-card:active {
+            transform: scale(0.98);
         }
 
         .piece-card.critique {
@@ -243,16 +234,76 @@
             text-align: center;
         }
 
-        .btn-suppr-piece {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: 600;
+        /* Fenêtre Modale (Fiche détail / modification) */
+        #modalDetails {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
         }
 
-        /* Section Fournisseurs repliée ou discrète */
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 14px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-duplicate {
+            background: #0284c7;
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-delete-modal {
+            background: var(--danger);
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         .toggle-section {
             margin-top: 25px;
             text-align: center;
@@ -282,52 +333,85 @@
         <p>Gestion rapide des pièces détachées</p>
     </header>
 
-    <!-- Barre de recherche et PDF -->
     <div class="actions-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher une pièce..." onkeyup="filtrerPieces()">
         <button class="btn-pdf" onclick="window.open('/api/export/pdf', '_blank')">PDF</button>
     </div>
 
-    <!-- Formulaire d'ajout de pièce -->
+    <!-- Formulaire d'ajout rapide -->
     <div class="card">
         <h2>Ajouter une nouvelle pièce</h2>
         <form id="formPiece" onsubmit="ajouterPiece(event)">
             <div class="form-row">
-                <div class="form-group">
-                    <input type="text" id="reference" placeholder="Référence" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="nom" placeholder="Nom de la pièce" required>
-                </div>
+                <div class="form-group"><input type="text" id="reference" placeholder="Référence" required></div>
+                <div class="form-group"><input type="text" id="nom" placeholder="Nom de la pièce" required></div>
             </div>
             <div class="form-row">
+                <div class="form-group"><input type="text" id="emplacement" placeholder="Emplacement (ex: Étagère 2)"></div>
                 <div class="form-group">
-                    <input type="text" id="emplacement" placeholder="Emplacement (ex: Étagère 2)">
-                </div>
-                <div class="form-group">
-                    <select id="fournisseur_id">
+                    <select id="fournisseur_id" class="select-fournisseur">
                         <option value="">-- Fournisseur --</option>
                     </select>
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group">
-                    <input type="number" id="quantite" placeholder="Qté initiale" min="0" required>
-                </div>
-                <div class="form-group">
-                    <input type="number" id="seuil_alerte" placeholder="Seuil alerte" min="0" required>
-                </div>
+                <div class="form-group"><input type="number" id="quantite" placeholder="Qté initiale" min="0" required></div>
+                <div class="form-group"><input type="number" id="seuil_alerte" placeholder="Seuil alerte" min="0" required></div>
             </div>
             <button type="submit" class="btn-primary">+ Enregistrer la pièce</button>
         </form>
     </div>
 
-    <!-- Liste des pièces -->
-    <div class="pieces-list" id="listePieces">
-        <!-- Chargé dynamiquement par JS -->
+    <div class="pieces-list" id="listePieces"></div>
+
+    <!-- FENÊTRE MODALE DE MODIFICATION / DETAILS -->
+    <div id="modalDetails" onclick="fermerModaleExterieur(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier la pièce</h2>
+                <button class="btn-close" onclick="fermerModale()">&times;</button>
+            </div>
+            <form id="formModifierPiece" onsubmit="modifierPieceComplete(event)">
+                <input type="hidden" id="mod_id">
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:var(--text-muted);">Référence</label>
+                    <input type="text" id="mod_reference" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:var(--text-muted);">Nom de la pièce</label>
+                    <input type="text" id="mod_nom" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:var(--text-muted);">Emplacement</label>
+                    <input type="text" id="mod_emplacement">
+                </div>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; color:var(--text-muted);">Fournisseur</label>
+                    <select id="mod_fournisseur_id" class="select-fournisseur">
+                        <option value="">-- Fournisseur --</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Quantité</label>
+                        <input type="number" id="mod_quantite" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Seuil d'alerte</label>
+                        <input type="number" id="mod_seuil_alerte" min="0" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Enregistrer les modifications</button>
+            </form>
+
+            <div class="modal-actions">
+                <button class="btn-duplicate" onclick="dupliquerPieceCourante()">📋 Dupliquer</button>
+                <button class="btn-delete-modal" onclick="supprimerPieceCourante()">🗑️ Supprimer</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Gestion des fournisseurs (discret en bas) -->
+    <!-- Gestion des fournisseurs -->
     <div class="toggle-section">
         <button class="toggle-btn" onclick="toggleFournisseurs()">⚙️ Gérer les fournisseurs</button>
     </div>
@@ -335,12 +419,8 @@
     <div class="card" id="fournisseurs-container">
         <h2>Fournisseurs</h2>
         <form id="formFournisseur" onsubmit="ajouterFournisseur(event)">
-            <div class="form-group">
-                <input type="text" id="nomFournisseur" placeholder="Nom du fournisseur" required>
-            </div>
-            <div class="form-group">
-                <input type="text" id="contactFournisseur" placeholder="Contact (Téléphone / Email)">
-            </div>
+            <div class="form-group"><input type="text" id="nomFournisseur" placeholder="Nom du fournisseur" required></div>
+            <div class="form-group"><input type="text" id="contactFournisseur" placeholder="Contact (Téléphone / Email)"></div>
             <button type="submit" class="btn-primary" style="background: #475569;">Ajouter le fournisseur</button>
         </form>
         <div id="listeFournisseurs" style="margin-top: 15px;"></div>
@@ -348,14 +428,13 @@
 
     <script>
         let toutesLesPieces = [];
+        let idPieceEnCours = null;
 
         function montrerNotification(message) {
             const notif = document.getElementById('notification');
             notif.innerText = message;
             notif.style.display = 'block';
-            setTimeout(() => {
-                notif.style.display = 'none';
-            }, 2000);
+            setTimeout(() => { notif.style.display = 'none'; }, 2000);
         }
 
         function toggleFournisseurs() {
@@ -364,7 +443,6 @@
             if(container.style.display === 'block') chargerFournisseurs();
         }
 
-        // Charger les données au démarrage
         window.onload = function() {
             chargerPieces();
             chargerSelectFournisseurs();
@@ -374,10 +452,14 @@
             fetch('/api/fournisseurs')
                 .then(res => res.json())
                 .then(fournisseurs => {
-                    const select = document.getElementById('fournisseur_id');
-                    select.innerHTML = '<option value="">-- Fournisseur --</option>';
-                    fournisseurs.forEach(f => {
-                        select.innerHTML += `<option value="${f.id}">${f.nom}</option>`;
+                    const selects = document.querySelectorAll('.select-fournisseur');
+                    selects.forEach(select => {
+                        const valeurActuelle = select.value;
+                        select.innerHTML = '<option value="">-- Fournisseur --</option>';
+                        fournisseurs.forEach(f => {
+                            select.innerHTML += `<option value="${f.id}">${f.nom}</option>`;
+                        });
+                        select.value = valeurActuelle;
                     });
                 });
         }
@@ -403,13 +485,13 @@
             pieces.forEach(p => {
                 const estCritique = p.quantite <= p.seuil_alerte;
                 container.innerHTML += `
-                    <div class="piece-card ${estCritique ? 'critique' : ''}">
+                    <div class="piece-card ${estCritique ? 'critique' : ''}" onclick="ouvrirModale(event, ${p.id})">
                         <div class="piece-header">
                             <div>
                                 <span class="piece-ref">${p.reference}</span>
                                 <div class="piece-name">${p.nom}</div>
                             </div>
-                            <button class="btn-suppr-piece" onclick="supprimerPiece(${p.id})">Supprimer</button>
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Modifier ✏️</span>
                         </div>
                         <div class="piece-details">
                             <div>📍 ${p.emplacement || 'Non classé'}</div>
@@ -419,7 +501,7 @@
                             <span style="font-size: 0.85rem; color: ${estCritique ? '#991b1b' : 'var(--text-muted)'}; font-weight: ${estCritique ? 'bold' : 'normal'};">
                                 ${estCritique ? '⚠️ Stock bas !' : `Alerte si ≤ ${p.seuil_alerte}`}
                             </span>
-                            <div class="quantity-control">
+                            <div class="quantity-control" onclick="event.stopPropagation()">
                                 <button class="qty-btn" onclick="modifierQuantite(${p.id}, ${p.quantite - 1})">-</button>
                                 <span class="qty-display">${p.quantite}</span>
                                 <button class="qty-btn" onclick="modifierQuantite(${p.id}, ${p.quantite + 1})">+</button>
@@ -428,6 +510,76 @@
                     </div>
                 `;
             });
+        }
+
+        function ouvrirModale(event, id) {
+            idPieceEnCours = id;
+            const p = toutesLesPieces.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('mod_id').value = p.id;
+            document.getElementById('mod_reference').value = p.reference;
+            document.getElementById('mod_nom').value = p.nom;
+            document.getElementById('mod_emplacement').value = p.emplacement || '';
+            document.getElementById('mod_fournisseur_id').value = p.fournisseur_id || '';
+            document.getElementById('mod_quantite').value = p.quantite;
+            document.getElementById('mod_seuil_alerte').value = p.seuil_alerte;
+
+            document.getElementById('modalDetails').style.display = 'flex';
+        }
+
+        function fermerModale() {
+            document.getElementById('modalDetails').style.display = 'none';
+        }
+
+        function fermerModaleExterieur(event) {
+            if (event.target.id === 'modalDetails') fermerModale();
+        }
+
+        function modifierPieceComplete(e) {
+            e.preventDefault();
+            const data = {
+                reference: document.getElementById('mod_reference').value,
+                nom: document.getElementById('mod_nom').value,
+                emplacement: document.getElementById('mod_emplacement').value,
+                quantite: parseInt(document.getElementById('mod_quantite').value),
+                seuil_alerte: parseInt(document.getElementById('mod_seuil_alerte').value),
+                fournisseur_id: document.getElementById('mod_fournisseur_id').value || null
+            };
+
+            fetch(`/api/pieces/${idPieceEnCours}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                fermerModale();
+                chargerPieces();
+                montrerNotification('Modifications enregistrées !');
+            });
+        }
+
+        function dupliquerPieceCourante() {
+            fetch(`/api/pieces/${idPieceEnCours}/dupliquer`, { method: 'POST' })
+                .then(res => res.json())
+                .then(() => {
+                    fermerModale();
+                    chargerPieces();
+                    montrerNotification('Pièce dupliquée avec succès !');
+                });
+        }
+
+        function supprimerPieceCourante() {
+            if (confirm("Voulez-vous vraiment supprimer cette pièce ?")) {
+                fetch(`/api/pieces/${idPieceEnCours}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(() => {
+                        fermerModale();
+                        chargerPieces();
+                        montrerNotification('Pièce supprimée.');
+                    });
+            }
         }
 
         function filtrerPieces() {
@@ -459,12 +611,9 @@
             .then(res => res.json())
             .then(() => {
                 document.getElementById('formPiece').reset();
-                document.getElementById('quantite').value = "1";
-                document.getElementById('seuil_alerte').value = "2";
                 chargerPieces();
                 montrerNotification('Pièce ajoutée avec succès !');
-            })
-            .catch(err => alert("Erreur lors de l'ajout"));
+            });
         }
 
         function modifierQuantite(id, nouvelleQuantite) {
@@ -476,17 +625,6 @@
             })
             .then(res => res.json())
             .then(() => chargerPieces());
-        }
-
-        function supprimerPiece(id) {
-            if (confirm("Voulez-vous supprimer cette pièce ?")) {
-                fetch(`/api/pieces/${id}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(() => {
-                        chargerPieces();
-                        montrerNotification('Pièce supprimée');
-                    });
-            }
         }
 
         function chargerFournisseurs() {

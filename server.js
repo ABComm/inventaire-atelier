@@ -300,6 +300,52 @@ app.get('/api/export/pdf', async (req, res) => {
     }
 });
 
+// --- MISE À JOUR COMPLÈTE D'UNE PIÈCE ---
+app.put('/api/pieces/:id', async (req, res) => {
+    const { reference, nom, emplacement, quantite, seuil_alerte, fournisseur_id } = req.body;
+    const id = req.params.id;
+
+    try {
+        await db.execute({
+            sql: `UPDATE pieces SET reference = ?, nom = ?, emplacement = ?, quantite = ?, seuil_alerte = ?, fournisseur_id = ? WHERE id = ?`,
+            args: [reference, nom, emplacement, quantite, seuil_alerte, fournisseur_id || null, id]
+        });
+
+        await enregistrerMouvement('MODIFICATION', `Mise à jour complète de la pièce [${reference}] ${nom}`);
+        res.json({ message: 'Pièce mise à jour avec succès' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// --- DUPLICATION D'UNE PIÈCE ---
+app.post('/api/pieces/:id/dupliquer', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const pieceResult = await db.execute({
+            sql: `SELECT * FROM pieces WHERE id = ?`,
+            args: [id]
+        });
+
+        if (pieceResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Pièce introuvable' });
+        }
+
+        const p = pieceResult.rows[0];
+        const nouvelleRef = p.reference + '_copie';
+
+        const result = await db.execute({
+            sql: `INSERT INTO pieces (reference, nom, emplacement, quantite, seuil_alerte, fournisseur_id) VALUES (?, ?, ?, ?, ?, ?)`,
+            args: [nouvelleRef, p.nom + ' (Copie)', p.emplacement, p.quantite, p.seuil_alerte, p.fournisseur_id]
+        });
+
+        await enregistrerMouvement('DUPLICATION', `Duplication de la pièce [${p.reference}] vers ${nouvelleRef}`);
+        res.json({ id: Number(result.lastInsertRowid) });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });
