@@ -188,6 +188,23 @@ async function chargerPieces() {
     }
 }
 
+// Variable globale pour stocker les mouvements
+window.tousLesMouvements = [];
+
+// Fonction pour charger les mouvements depuis l'API et les afficher
+async function chargerEtAfficherMouvements() {
+    try {
+        const reponse = await fetch('/api/mouvements');
+        window.tousLesMouvements = await reponse.json();
+        
+        // Une fois qu'on a les données, on met à jour l'affichage
+        afficherHistorique();
+    } catch (erreur) {
+        console.error("Erreur lors du chargement des mouvements :", erreur);
+    }
+}
+
+// Votre fonction d'affichage propre
 function afficherHistorique() {
     const historiqueContainer = document.getElementById('listeMouvements'); 
     if (!historiqueContainer) return;
