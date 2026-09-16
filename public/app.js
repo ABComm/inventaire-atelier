@@ -153,6 +153,9 @@ async function chargerPieces() {
         // Tri alphabétique croissant par nom de pièce (A à Z)
         pieces.sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
 
+        // VÉRIFICATION : Regardez dans la console F12 si les noms sont bien triés ici
+    console.log("Pièces triées :", pieces.map(p => p.nom));
+
         toutesLesPieces = pieces; // Met à jour la variable globale proprement
         
         const tbody = document.getElementById('pieces-list');
