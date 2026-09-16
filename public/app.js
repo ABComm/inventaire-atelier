@@ -189,7 +189,7 @@ async function chargerPieces() {
 }
 
 function afficherHistorique() {
-    const historiqueContainer = document.getElementById('listeHistorique'); // Remplacez par l'ID réel de votre conteneur si besoin
+    const historiqueContainer = document.getElementById('listeHistorique'); 
     if (!historiqueContainer) return;
 
     const mouvements = window.tousLesMouvements || [];
@@ -201,36 +201,42 @@ function afficherHistorique() {
 
     let html = '';
 
-    // Optionnel : inverser pour afficher les plus récents en premier si besoin (.slice().reverse())
     mouvements.forEach(m => {
-        // 1. Retrouver la pièce grâce à l'id stocké dans le mouvement
-        const piece = toutesLesPieces.find(p => p.id == m.id || p.id == m.pieceId || p.reference == m.reference);
-        const nomPiece = piece ? `${piece.reference} - ${piece.nom}` : `Pièce n°${m.id || 'inconnue'}`;
+        // Recherche intelligente de la pièce (si m.id ne correspond pas directement à une pièce, on cherche par pieceId ou on prend le texte des détails)
+        let piece = toutesLesPieces.find(p => p.id == m.id || p.id == m.pieceId);
+        
+        let nomPieceAffiche = "Action globale / Système";
+        if (piece) {
+            nomPieceAffiche = `${piece.reference} - ${piece.nom}`;
+        } else if (m.details && typeof m.details === 'string') {
+            // Extrait un bout de texte des détails si la pièce n'est pas trouvée par ID direct
+            nomPieceAffiche = m.details;
+        }
 
-        // 2. Gestion de la couleur et du texte selon le type d'action
-        let couleurType = '#3b82f6'; // Bleu par défaut
-        if (m.type === 'AJOUT') couleurType = '#22c55e';      // Vert
-        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; // Rouge
-        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; // Violet
-        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';// Orange
+        // Gestion propre de la quantité ou du type
+        let qteAffichee = m.quantite !== undefined ? m.quantite : '';
+        let couleurQte = '#ef4444';
+        
+        if (qteAffichee !== '') {
+            const signe = qteAffichee >= 0 ? '+' : '';
+            qteAffichee = `${signe}${qteAffichee}`;
+            couleurQte = qteAffichee >= 0 ? '#22c55e' : '#ef4444';
+        } else {
+            qteAffichee = m.type || 'INFO';
+        }
 
-        // 3. Date (vos dates sont déjà sous format texte "JJ/MM/AAAA HH:MM:SS", on les affiche directement)
+        // Date propre (vos dates sont déjà en format texte "JJ/MM/AAAA HH:MM:SS")
         const dateAffichage = m.date || 'Date non disponible';
 
-        // 4. Détails ou type d'action
-        const detailsTexte = m.details || m.type || 'Action sur le stock';
-
         html += `
-            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; margin-bottom: 8px; border-radius: 6px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <strong style="color: #1e293b; font-size: 0.95em;">${nomPiece}</strong>
-                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
+                    <strong style="color: #1e293b; font-size: 0.95em;">${nomPieceAffiche}</strong>
+                    <span style="color: ${couleurQte}; font-weight: bold; font-size: 0.9em;">${qteAffichee}</span>
                 </div>
-                <div style="font-size: 0.85em; color: #475569; margin-bottom: 6px;">
-                    ${detailsTexte}
-                </div>
-                <div style="text-align: right; font-size: 0.75em; color: #94a3b8;">
-                    ${dateAffichage}
+                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #64748b; margin-top: 6px;">
+                    <span>Type: ${m.type || 'MODIFICATION'}</span>
+                    <span>${dateAffichage}</span>
                 </div>
             </div>
         `;
