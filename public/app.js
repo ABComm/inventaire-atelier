@@ -188,12 +188,9 @@ async function chargerPieces() {
     }
 }
 
-window.afficherHistorique = function() {
+function afficherHistorique() {
     const historiqueContainer = document.getElementById('listeMouvements'); 
-    if (!historiqueContainer) {
-        console.error("Conteneur 'listeMouvements' introuvable dans le HTML !");
-        return;
-    }
+    if (!historiqueContainer) return;
 
     const mouvements = window.tousLesMouvements || [];
 
@@ -215,7 +212,7 @@ window.afficherHistorique = function() {
         const dateAffichage = m.date || 'Date non disponible';
 
         html += `
-            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); margin-bottom: 8px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
                     <span style="font-size: 0.75em; color: #94a3b8;">${dateAffichage}</span>
@@ -228,8 +225,7 @@ window.afficherHistorique = function() {
     });
 
     historiqueContainer.innerHTML = html;
-};
-
+}
 // Modifier la quantité
 async function modifierQuantite(id, qteActuelle, delta) {
     const nouvelleQte = qteActuelle + delta;
