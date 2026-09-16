@@ -150,11 +150,12 @@ async function chargerPieces() {
         const res = await fetch('/api/pieces');
         const pieces = await res.json();
         
-        // Tri alphabétique croissant par nom de pièce (A à Z)
-        pieces.sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
-
-        // VÉRIFICATION : Regardez dans la console F12 si les noms sont bien triés ici
-    console.log("Pièces triées :", pieces.map(p => p.nom));
+        // Tri alphabétique croissant par nom de pièce (A à Z) sécurisé
+        pieces.sort((a, b) => {
+            const nomA = a.nom ? a.nom.toLowerCase() : '';
+            const nomB = b.nom ? b.nom.toLowerCase() : '';
+            return nomA.localeCompare(nomB, 'fr', { sensitivity: 'base' });
+        });
 
         toutesLesPieces = pieces; // Met à jour la variable globale proprement
         
