@@ -34,7 +34,7 @@
             padding-bottom: 50px;
         }
 
-        /* Écran de connexion (Login) */
+        /* Écran de connexion */
         #loginOverlay {
             display: none;
             position: fixed;
@@ -57,38 +57,94 @@
             text-align: center;
         }
 
-        .login-card h2 {
-            margin-bottom: 5px;
-            font-size: 1.5rem;
-        }
+        .login-card h2 { margin-bottom: 5px; font-size: 1.5rem; }
+        .login-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+        #loginError { color: var(--danger); font-size: 0.85rem; margin-bottom: 10px; display: none; }
 
-        .login-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        #loginError {
-            color: var(--danger);
-            font-size: 0.85rem;
-            margin-bottom: 10px;
-            display: none;
-        }
-
+        /* En-tête avec bouton Hamburger */
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        header h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
+        .header-title h1 { font-size: 1.2rem; font-weight: 700; }
+        .header-title p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .btn-menu {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--text-main);
         }
 
-        header p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        /* Menu à tiroir (Drawer) */
+        #drawerOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 3000;
         }
+
+        .drawer {
+            position: fixed;
+            top: 0; right: -280px; width: 280px; height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 3001;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .drawer.open { right: 0; }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .drawer-header h3 { font-size: 1.1rem; }
+
+        .drawer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .drawer-link {
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+
+        .drawer-link:hover { background: var(--bg-color); }
+        .drawer-link.danger { color: var(--danger); }
 
         #notification {
             display: none;
@@ -103,7 +159,7 @@
             font-size: 0.9rem;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 3000;
+            z-index: 4000;
         }
 
         .actions-bar {
@@ -142,23 +198,11 @@
             border: 1px solid var(--border);
         }
 
-        .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-        }
+        .card h2 { font-size: 1.1rem; margin-bottom: 12px; }
 
-        .form-group {
-            margin-bottom: 10px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-        }
+        .form-group { margin-bottom: 10px; }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
 
         input, select {
             width: 100%;
@@ -199,14 +243,8 @@
             transition: transform 0.1s;
         }
 
-        .piece-card:active {
-            transform: scale(0.98);
-        }
-
-        .piece-card.critique {
-            background-color: var(--danger-bg);
-            border-color: #fca5a5;
-        }
+        .piece-card:active { transform: scale(0.98); }
+        .piece-card.critique { background-color: var(--danger-bg); border-color: #fca5a5; }
 
         .piece-header {
             display: flex;
@@ -224,13 +262,8 @@
             color: #475569;
         }
 
-        .piece-name {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-top: 4px;
-        }
-
+        .piece-name { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-top: 4px; }
+        
         .piece-details {
             font-size: 0.85rem;
             color: var(--text-muted);
@@ -248,35 +281,22 @@
             padding-top: 10px;
         }
 
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .quantity-control { display: flex; align-items: center; gap: 10px; }
 
         .qty-btn {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             border: 1px solid var(--border);
             background: white;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1.1rem; font-weight: bold;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .qty-display {
-            font-size: 1.1rem;
-            font-weight: 700;
-            min-width: 25px;
-            text-align: center;
-        }
+        .qty-display { font-size: 1.1rem; font-weight: 700; min-width: 25px; text-align: center; }
 
-        /* Modale */
-        #modalDetails {
+        /* Fenêtres Modales globales (Ajout, Modification, Fournisseurs, Traçabilité) */
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -313,65 +333,9 @@
             color: var(--text-muted);
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-duplicate {
-            background: #0284c7;
-            color: white;
-            border: none;
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-delete-modal {
-            background: var(--danger);
-            color: white;
-            border: none;
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .toggle-section {
-            margin-top: 25px;
-            text-align: center;
-        }
-        
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        #fournisseurs-container {
-            display: none;
-            margin-top: 10px;
-        }
-
-        .logout-container {
-            margin-top: 40px;
-            text-align: center;
-        }
-        .btn-logout {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-decoration: underline;
-        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-duplicate { background: #0284c7; color: white; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-delete-modal { background: var(--danger); color: white; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -383,12 +347,8 @@
             <p>Veuillez vous identifier pour accéder au stock</p>
             <div id="loginError">Identifiant ou mot de passe incorrect</div>
             <form onsubmit="connecter(event)">
-                <div class="form-group">
-                    <input type="text" id="loginUser" placeholder="Identifiant" required>
-                </div>
-                <div class="form-group" style="margin-top: 10px;">
-                    <input type="password" id="loginPass" placeholder="Mot de passe" required>
-                </div>
+                <div class="form-group"><input type="text" id="loginUser" placeholder="Identifiant" required></div>
+                <div class="form-group" style="margin-top: 10px;"><input type="password" id="loginPass" placeholder="Mot de passe" required></div>
                 <button type="submit" class="btn-primary" style="margin-top: 15px;">Se connecter</button>
             </form>
         </div>
@@ -396,48 +356,73 @@
 
     <div id="notification">Action réussie !</div>
 
+    <!-- EN-TÊTE AVEC BOUTON MENU HAMBURGER -->
     <header>
-        <h1>🔧 Atelier Méca - Stock</h1>
-        <p>Gestion rapide des pièces détachées</p>
+        <div class="header-title">
+            <h1>🔧 Atelier Méca - Stock</h1>
+            <p>Gestion rapide des pièces détachées</p>
+        </div>
+        <button class="btn-menu" onclick="basculerMenu()">☰</button>
     </header>
+
+    <!-- MENU À TIROIR (DRAWER) -->
+    <div id="drawerOverlay" onclick="fermerMenu()"></div>
+    <div class="drawer" id="appDrawer">
+        <div class="drawer-header">
+            <h3>Menu Principal</h3>
+            <button class="btn-close" onclick="fermerMenu()">&times;</button>
+        </div>
+        <div class="drawer-links">
+            <button class="drawer-link" onclick="ouvrirModalAjout()">➕ Ajouter une pièce</button>
+            <button class="drawer-link" onclick="ouvrirModalFournisseurs()">📦 Gérer les fournisseurs</button>
+            <button class="drawer-link" onclick="ouvrirModalTracabilite()">📋 Traçabilité (Historique)</button>
+            <hr style="border:0; border-top:1px solid var(--border); margin: 5px 0;">
+            <button class="drawer-link danger" onclick="deconnecter()">🔒 Déconnexion</button>
+        </div>
+    </div>
 
     <div class="actions-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher une pièce..." onkeyup="filtrerPieces()">
         <button class="btn-pdf" onclick="window.open('/api/export/pdf', '_blank')">PDF</button>
     </div>
 
-    <!-- Formulaire d'ajout -->
-    <div class="card">
-        <h2>Ajouter une nouvelle pièce</h2>
-        <form id="formPiece" onsubmit="ajouterPiece(event)">
-            <div class="form-row">
-                <div class="form-group"><input type="text" id="reference" placeholder="Référence" required></div>
-                <div class="form-group"><input type="text" id="nom" placeholder="Nom de la pièce" required></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><input type="text" id="emplacement" placeholder="Emplacement (ex: Étagère 2)"></div>
-                <div class="form-group">
-                    <select id="fournisseur_id" class="select-fournisseur">
-                        <option value="">-- Fournisseur --</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><input type="number" id="quantite" placeholder="Qté initiale" min="0" required></div>
-                <div class="form-group"><input type="number" id="seuil_alerte" placeholder="Seuil alerte" min="0" required></div>
-            </div>
-            <button type="submit" class="btn-primary">+ Enregistrer la pièce</button>
-        </form>
-    </div>
-
     <div class="pieces-list" id="listePieces"></div>
 
-    <!-- MODALE DE MODIFICATION -->
-    <div id="modalDetails" onclick="fermerModaleExterieur(event)">
+    <!-- MODALE : AJOUTER UNE PIÈCE -->
+    <div id="modalAjout" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalAjout')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter une pièce</h2>
+                <button class="btn-close" onclick="fermerModalAjout()">&times;</button>
+            </div>
+            <form id="formPiece" onsubmit="ajouterPiece(event)">
+                <div class="form-row">
+                    <div class="form-group"><input type="text" id="reference" placeholder="Référence" required></div>
+                    <div class="form-group"><input type="text" id="nom" placeholder="Nom de la pièce" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><input type="text" id="emplacement" placeholder="Emplacement (ex: Étagère 2)"></div>
+                    <div class="form-group">
+                        <select id="fournisseur_id" class="select-fournisseur">
+                            <option value="">-- Fournisseur --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><input type="number" id="quantite" placeholder="Qté initiale" min="0" required></div>
+                    <div class="form-group"><input type="number" id="seuil_alerte" placeholder="Seuil alerte" min="0" required></div>
+                </div>
+                <button type="submit" class="btn-primary">+ Enregistrer la pièce</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE : MODIFICATION / DETAIL D'UNE PIÈCE -->
+    <div id="modalDetails" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalDetails')">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Modifier la pièce</h2>
-                <button class="btn-close" onclick="fermerModale()">&times;</button>
+                <button class="btn-close" onclick="fermerModaleDetails()">&times;</button>
             </div>
             <form id="formModifierPiece" onsubmit="modifierPieceComplete(event)">
                 <input type="hidden" id="mod_id">
@@ -479,31 +464,39 @@
         </div>
     </div>
 
-    <!-- Fournisseurs -->
-    <div class="toggle-section">
-        <button class="toggle-btn" onclick="toggleFournisseurs()">⚙️ Gérer les fournisseurs</button>
+    <!-- MODALE : GESTION FOURNISSEURS -->
+    <div id="modalFournisseurs" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalFournisseurs')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Gestion des Fournisseurs</h2>
+                <button class="btn-close" onclick="fermerModalFournisseurs()">&times;</button>
+            </div>
+            <form id="formFournisseur" onsubmit="ajouterFournisseur(event)">
+                <div class="form-group"><input type="text" id="nomFournisseur" placeholder="Nom du fournisseur" required></div>
+                <div class="form-group"><input type="text" id="contactFournisseur" placeholder="Contact (Téléphone / Email)"></div>
+                <button type="submit" class="btn-primary" style="background: #475569;">Ajouter le fournisseur</button>
+            </form>
+            <div id="listeFournisseurs" style="margin-top: 15px; max-height: 250px; overflow-y: auto;"></div>
+        </div>
     </div>
 
-    <div class="card" id="fournisseurs-container">
-        <h2>Fournisseurs</h2>
-        <form id="formFournisseur" onsubmit="ajouterFournisseur(event)">
-            <div class="form-group"><input type="text" id="nomFournisseur" placeholder="Nom du fournisseur" required></div>
-            <div class="form-group"><input type="text" id="contactFournisseur" placeholder="Contact (Téléphone / Email)"></div>
-            <button type="submit" class="btn-primary" style="background: #475569;">Ajouter le fournisseur</button>
-        </form>
-        <div id="listeFournisseurs" style="margin-top: 15px;"></div>
-    </div>
-
-    <!-- Déconnexion -->
-    <div class="logout-container">
-        <button class="btn-logout" onclick="deconnecter()">Verrouiller / Se déconnecter de cet appareil</button>
+    <!-- MODALE : TRAÇABILITÉ -->
+    <div id="modalTracabilite" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalTracabilite')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Traçabilité (Historique)</h2>
+                <button class="btn-close" onclick="fermerModalTracabilite()">&times;</button>
+            </div>
+            <div id="listeMouvements" style="font-size: 0.85rem; max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                Chargement...
+            </div>
+        </div>
     </div>
 
     <script>
         let toutesLesPieces = [];
         let idPieceEnCours = null;
 
-        // Vérification de la session au chargement
         window.onload = function() {
             const token = localStorage.getItem('atelier_token');
             if (!token) {
@@ -534,9 +527,7 @@
                     document.getElementById('loginError').style.display = 'block';
                 }
             })
-            .catch(() => {
-                document.getElementById('loginError').style.display = 'block';
-            });
+            .catch(() => { document.getElementById('loginError').style.display = 'block'; });
         }
 
         function deconnecter() {
@@ -556,10 +547,44 @@
             setTimeout(() => { notif.style.display = 'none'; }, 2000);
         }
 
-        function toggleFournisseurs() {
-            const container = document.getElementById('fournisseurs-container');
-            container.style.display = container.style.display === 'block' ? 'none' : 'block';
-            if(container.style.display === 'block') chargerFournisseurs();
+        /* Gestion du menu à tiroir */
+        function basculerMenu() {
+            const drawer = document.getElementById('appDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            const isOpen = drawer.classList.contains('open');
+            if (isOpen) {
+                fermerMenu();
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        }
+
+        function fermerMenu() {
+            document.getElementById('appDrawer').classList.remove('open');
+            document.getElementById('drawerOverlay').style.display = 'none';
+        }
+
+        /* Gestion des fenêtres modales */
+        function ouvrirModalAjout() { fermerMenu(); document.getElementById('modalAjout').style.display = 'flex'; }
+        function fermerModalAjout() { document.getElementById('modalAjout').style.display = 'none'; }
+
+        function ouvrirModalFournisseurs() { fermerMenu(); document.getElementById('modalFournisseurs').style.display = 'flex'; chargerFournisseurs(); }
+        function fermerModalFournisseurs() { document.getElementById('modalFournisseurs').style.display = 'none'; }
+
+        function ouvrirModalTracabilite() { 
+            fermerMenu(); 
+            document.getElementById('modalTracabilite').style.display = 'flex'; 
+            chargerTracabilite(); 
+        }
+        function fermerModalTracabilite() { document.getElementById('modalTracabilite').style.display = 'none'; }
+
+        function fermerModaleDetails() { document.getElementById('modalDetails').style.display = 'none'; }
+
+        function fermerModaleExterieur(event, idModal) {
+            if (event.target.id === idModal) {
+                document.getElementById(idModal).style.display = 'none';
+            }
         }
 
         function chargerSelectFournisseurs() {
@@ -599,7 +624,7 @@
             pieces.forEach(p => {
                 const estCritique = p.quantite <= p.seuil_alerte;
                 container.innerHTML += `
-                    <div class="piece-card ${estCritique ? 'critique' : ''}" onclick="ouvrirModale(event, ${p.id})">
+                    <div class="piece-card ${estCritique ? 'critique' : ''}" onclick="ouvrirModaleDetails(${p.id})">
                         <div class="piece-header">
                             <div>
                                 <span class="piece-ref">${p.reference}</span>
@@ -626,7 +651,7 @@
             });
         }
 
-        function ouvrirModale(event, id) {
+        function ouvrirModaleDetails(id) {
             idPieceEnCours = id;
             const p = toutesLesPieces.find(item => item.id === id);
             if (!p) return;
@@ -640,14 +665,6 @@
             document.getElementById('mod_seuil_alerte').value = p.seuil_alerte;
 
             document.getElementById('modalDetails').style.display = 'flex';
-        }
-
-        function fermerModale() {
-            document.getElementById('modalDetails').style.display = 'none';
-        }
-
-        function fermerModaleExterieur(event) {
-            if (event.target.id === 'modalDetails') fermerModale();
         }
 
         function modifierPieceComplete(e) {
@@ -668,7 +685,7 @@
             })
             .then(res => res.json())
             .then(() => {
-                fermerModale();
+                fermerModaleDetails();
                 chargerPieces();
                 montrerNotification('Modifications enregistrées !');
             });
@@ -678,7 +695,7 @@
             fetch(`/api/pieces/${idPieceEnCours}/dupliquer`, { method: 'POST' })
                 .then(res => res.json())
                 .then(() => {
-                    fermerModale();
+                    fermerModaleDetails();
                     chargerPieces();
                     montrerNotification('Pièce dupliquée avec succès !');
                 });
@@ -689,7 +706,7 @@
                 fetch(`/api/pieces/${idPieceEnCours}`, { method: 'DELETE' })
                     .then(res => res.json())
                     .then(() => {
-                        fermerModale();
+                        fermerModaleDetails();
                         chargerPieces();
                         montrerNotification('Pièce supprimée.');
                     });
@@ -725,6 +742,7 @@
             .then(res => res.json())
             .then(() => {
                 document.getElementById('formPiece').reset();
+                fermerModalAjout();
                 chargerPieces();
                 montrerNotification('Pièce ajoutée avec succès !');
             });
@@ -746,6 +764,10 @@
                 .then(res => res.json())
                 .then(fournisseurs => {
                     const div = document.getElementById('listeFournisseurs');
+                    if (fournisseurs.length === 0) {
+                        div.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun fournisseur.</p>';
+                        return;
+                    }
                     div.innerHTML = fournisseurs.map(f => `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px solid var(--border);">
                             <div><b>${f.nom}</b> <span style="font-size:0.8rem; color:var(--text-muted);">${f.contact ? '('+f.contact+')' : ''}</span></div>
@@ -786,6 +808,27 @@
                         montrerNotification('Fournisseur supprimé');
                     });
             }
+        }
+
+        function chargerTracabilite() {
+            fetch('/api/mouvements')
+                .then(res => res.json())
+                .then(mouvements => {
+                    const div = document.getElementById('listeMouvements');
+                    if (mouvements.length === 0) {
+                        div.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun mouvement enregistré.</p>';
+                        return;
+                    }
+                    div.innerHTML = mouvements.map(m => `
+                        <div style="padding: 8px; background: var(--bg-color); border-radius: 6px; border: 1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--primary); font-size:0.8rem;">
+                                <span>${m.type}</span>
+                                <span style="color:var(--text-muted); font-weight:normal;">${new Date(m.date).toLocaleString()}</span>
+                            </div>
+                            <div style="margin-top:2px;">${m.description}</div>
+                        </div>
+                    `).join('');
+                });
         }
     </script>
 </body>

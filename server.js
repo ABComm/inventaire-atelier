@@ -362,6 +362,16 @@ app.post('/api/login', (req, res) => {
     }
 });
 
+// --- HISTORIQUE / TRAÇABILITÉ ---
+app.get('/api/mouvements', async (req, res) => {
+    try {
+        const result = await db.execute(`SELECT * FROM mouvements ORDER BY date DESC LIMIT 50`);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });
