@@ -189,17 +189,6 @@
             font-size: 0.9rem;
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-        }
-
-        .card h2 { font-size: 1.1rem; margin-bottom: 12px; }
-
         .form-group { margin-bottom: 10px; }
         .form-row { display: flex; gap: 10px; }
         .form-row .form-group { flex: 1; }
@@ -295,7 +284,7 @@
 
         .qty-display { font-size: 1.1rem; font-weight: 700; min-width: 25px; text-align: center; }
 
-        /* Fenêtres Modales globales (Ajout, Modification, Fournisseurs, Traçabilité) */
+        /* Fenêtres Modales globales */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -637,8 +626,8 @@
                             <div>📦 Fourn: ${p.fournisseur_nom || 'Aucun'}</div>
                         </div>
                         <div class="piece-footer">
-                            <span style="font-size: 0.85rem; color: ${estCritique ? '#991b1b' : 'var(--text-muted)'}; font-weight: ${estCritique ? 'bold' : 'normal'};">
-                                ${estCritique ? '⚠️ Stock bas !' : `Alerte si ≤ ${p.seuil_alerte}`}
+                            <span style="font-size: 0.85rem; color: #991b1b; font-weight: bold;">
+                                ${estCritique ? '⚠️ Stock bas !' : ''}
                             </span>
                             <div class="quantity-control" onclick="event.stopPropagation()">
                                 <button class="qty-btn" onclick="modifierQuantite(${p.id}, ${p.quantite - 1})">-</button>
@@ -812,10 +801,11 @@
 
         function chargerTracabilite() {
             fetch('/api/mouvements')
-                .then(res => res.json())
+                .text() // ou res.json() selon ton implémentation
+                .then(res => res ? JSON.parse(res) : [])
                 .then(mouvements => {
                     const div = document.getElementById('listeMouvements');
-                    if (mouvements.length === 0) {
+                    if (!mouvements || mouvements.length === 0) {
                         div.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun mouvement enregistré.</p>';
                         return;
                     }
@@ -828,6 +818,9 @@
                             <div style="margin-top:2px;">${m.description}</div>
                         </div>
                     `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('listeMouvements').innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun mouvement enregistré.</p>';
                 });
         }
     </script>
