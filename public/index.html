@@ -270,19 +270,16 @@
             padding-top: 10px;
         }
 
-        .quantity-control { display: flex; align-items: center; gap: 10px; }
-
-        .qty-btn {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: white;
-            font-size: 1.1rem; font-weight: bold;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+        .quantity-display-container {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
         }
 
-        .qty-display { font-size: 1.1rem; font-weight: 700; min-width: 25px; text-align: center; }
+        .quantity-display-container strong {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
 
         /* Fenêtres Modales globales */
         .modal-overlay {
@@ -629,10 +626,8 @@
                             <span style="font-size: 0.85rem; color: #991b1b; font-weight: bold;">
                                 ${estCritique ? '⚠️ Stock bas !' : ''}
                             </span>
-                            <div class="quantity-control" onclick="event.stopPropagation()">
-                                <button class="qty-btn" onclick="modifierQuantite(${p.id}, ${p.quantite - 1})">-</button>
-                                <span class="qty-display">${p.quantite}</span>
-                                <button class="qty-btn" onclick="modifierQuantite(${p.id}, ${p.quantite + 1})">+</button>
+                            <div class="quantity-display-container">
+                                Quantité : <strong>${p.quantite}</strong>
                             </div>
                         </div>
                     </div>
@@ -737,17 +732,6 @@
             });
         }
 
-        function modifierQuantite(id, nouvelleQuantite) {
-            if (nouvelleQuantite < 0) return;
-            fetch(`/api/pieces/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantite: nouvelleQuantite })
-            })
-            .then(res => res.json())
-            .then(() => chargerPieces());
-        }
-
         function chargerFournisseurs() {
             fetch('/api/fournisseurs')
                 .then(res => res.json())
@@ -801,8 +785,7 @@
 
         function chargerTracabilite() {
             fetch('/api/mouvements')
-                .text() // ou res.json() selon ton implémentation
-                .then(res => res ? JSON.parse(res) : [])
+                .then(res => res ? res.json() : [])
                 .then(mouvements => {
                     const div = document.getElementById('listeMouvements');
                     if (!mouvements || mouvements.length === 0) {
