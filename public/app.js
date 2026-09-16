@@ -189,54 +189,48 @@ async function chargerPieces() {
 }
 
 function afficherHistorique() {
-    const historiqueContainer = document.getElementById('listeHistorique'); // Remplacez par l'ID réel de votre conteneur
+    const historiqueContainer = document.getElementById('listeHistorique'); // Remplacez par l'ID réel de votre conteneur si besoin
     if (!historiqueContainer) return;
 
-    let html = '';
-
-    // Vérification si le tableau des mouvements existe
     const mouvements = window.tousLesMouvements || [];
 
     if (mouvements.length === 0) {
-        historiqueContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 15px;">Aucun historique enregistré.</p>';
+        historiqueContainer.innerHTML = '<p style="text-align:center; color: #64748b; padding: 15px;">Aucun historique enregistré.</p>';
         return;
     }
 
+    let html = '';
+
+    // Optionnel : inverser pour afficher les plus récents en premier si besoin (.slice().reverse())
     mouvements.forEach(m => {
-        // Recherche souple de la pièce (gère les IDs numériques et textuels)
-        const piece = toutesLesPieces.find(p => p.id == m.pieceId || p.id == m.id_piece || p.reference === m.reference);
-        const nomPiece = piece ? `${piece.reference} - ${piece.nom}` : 'Pièce introuvable';
+        // 1. Retrouver la pièce grâce à l'id stocké dans le mouvement
+        const piece = toutesLesPieces.find(p => p.id == m.id || p.id == m.pieceId || p.reference == m.reference);
+        const nomPiece = piece ? `${piece.reference} - ${piece.nom}` : `Pièce n°${m.id || 'inconnue'}`;
 
-        // Formatage de la quantité / valeur
-        const quantiteBrute = m.quantite !== undefined ? m.quantite : (m.valeur || 0);
-        const signe = quantiteBrute > 0 ? '+' : '';
-        const affichageQuantite = `${signe}${quantiteBrute}`;
-        const couleurQuantite = quantiteBrute >= 0 ? 'color: var(--success, #28a745);' : 'color: var(--danger, #dc3545);';
+        // 2. Gestion de la couleur et du texte selon le type d'action
+        let couleurType = '#3b82f6'; // Bleu par défaut
+        if (m.type === 'AJOUT') couleurType = '#22c55e';      // Vert
+        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; // Rouge
+        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; // Violet
+        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';// Orange
 
-        // Formatage sécurisé de la date
-        let dateFormatee = 'Date non disponible';
-        if (m.date || m.date_creation || m.timestamp) {
-            const dateObj = new Date(m.date || m.date_creation || m.timestamp);
-            if (!isNaN(dateObj.getTime())) {
-                dateFormatee = dateObj.toLocaleDateString('fr-FR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-        }
+        // 3. Date (vos dates sont déjà sous format texte "JJ/MM/AAAA HH:MM:SS", on les affiche directement)
+        const dateAffichage = m.date || 'Date non disponible';
+
+        // 4. Détails ou type d'action
+        const detailsTexte = m.details || m.type || 'Action sur le stock';
 
         html += `
-            <div class="historique-item" style="padding: 12px; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong>${nomPiece}</strong>
-                    <span style="${couleurQuantite} font-weight: bold;">${affichageQuantite}</span>
+            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; margin-bottom: 8px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="color: #1e293b; font-size: 0.95em;">${nomPiece}</strong>
+                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #64748b; margin-top: 4px;">
-                    <span>Type: ${m.type || 'MODIFICATION'}</span>
-                    <span>${dateFormatee}</span>
+                <div style="font-size: 0.85em; color: #475569; margin-bottom: 6px;">
+                    ${detailsTexte}
+                </div>
+                <div style="text-align: right; font-size: 0.75em; color: #94a3b8;">
+                    ${dateAffichage}
                 </div>
             </div>
         `;
