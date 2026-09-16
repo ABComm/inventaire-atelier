@@ -322,6 +322,14 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-duplicate { background: #0284c7; color: white; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-delete-modal { background: var(--danger); color: white; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        
+        .movement-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -403,47 +411,69 @@
         </div>
     </div>
 
-    <!-- MODALE : MODIFICATION / DETAIL D'UNE PIÈCE -->
+    <!-- MODALE : MODIFICATION / MOUVEMENT D'UNE PIÈCE -->
     <div id="modalDetails" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalDetails')">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Modifier la pièce</h2>
+                <h2>Gérer les stocks</h2>
                 <button class="btn-close" onclick="fermerModaleDetails()">&times;</button>
             </div>
-            <form id="formModifierPiece" onsubmit="modifierPieceComplete(event)">
-                <input type="hidden" id="mod_id">
-                <div class="form-group">
-                    <label style="font-size:0.8rem; color:var(--text-muted);">Référence</label>
-                    <input type="text" id="mod_reference" required>
-                </div>
-                <div class="form-group">
-                    <label style="font-size:0.8rem; color:var(--text-muted);">Nom de la pièce</label>
-                    <input type="text" id="mod_nom" required>
-                </div>
-                <div class="form-group">
-                    <label style="font-size:0.8rem; color:var(--text-muted);">Emplacement</label>
-                    <input type="text" id="mod_emplacement">
-                </div>
-                <div class="form-group">
-                    <label style="font-size:0.8rem; color:var(--text-muted);">Fournisseur</label>
-                    <select id="mod_fournisseur_id" class="select-fournisseur">
-                        <option value="">-- Fournisseur --</option>
-                    </select>
-                </div>
+
+            <!-- Bloc Mouvement Entrée / Sortie -->
+            <div class="movement-box">
+                <label style="font-size:0.85rem; font-weight:bold; color:var(--primary); display:block; margin-bottom:8px;">🔄 Enregistrer un Mouvement</label>
                 <div class="form-row">
                     <div class="form-group">
-                        <label style="font-size:0.8rem; color:var(--text-muted);">Quantité</label>
-                        <input type="number" id="mod_quantite" min="0" required>
+                        <select id="mouvement_type">
+                            <option value="ENTREE">➕ Entrée (+)</option>
+                            <option value="SORTIE">➖ Sortie (-)</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label style="font-size:0.8rem; color:var(--text-muted);">Seuil d'alerte</label>
-                        <input type="number" id="mod_seuil_alerte" min="0" required>
+                        <input type="number" id="mouvement_quantite" placeholder="Quantité" min="1" value="1">
                     </div>
                 </div>
-                <button type="submit" class="btn-primary">Enregistrer les modifications</button>
-            </form>
+                <button type="button" class="btn-primary" onclick="validerMouvement()" style="background:var(--success); margin-top:8px;">Valider le mouvement</button>
+            </div>
 
-            <div class="modal-actions">
+            <hr style="border:0; border-top:1px solid var(--border); margin: 15px 0;">
+
+            <details style="font-size:0.9rem; color:var(--text-muted);">
+                <summary style="cursor:pointer; font-weight:600; margin-bottom:10px;">⚙️ Modifier les informations de la pièce</summary>
+                <form id="formModifierPiece" onsubmit="modifierPieceComplete(event)">
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Référence</label>
+                        <input type="text" id="mod_reference" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Nom de la pièce</label>
+                        <input type="text" id="mod_nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Emplacement</label>
+                        <input type="text" id="mod_emplacement">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.8rem; color:var(--text-muted);">Fournisseur</label>
+                        <select id="mod_fournisseur_id" class="select-fournisseur">
+                            <option value="">-- Fournisseur --</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Stock Actuel</label>
+                            <input type="number" id="mod_quantite" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Seuil d'alerte</label>
+                            <input type="number" id="mod_seuil_alerte" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="margin-top:10px;">Enregistrer les modifications</button>
+                </form>
+            </details>
+
+            <div class="modal-actions" style="margin-top: 15px;">
                 <button class="btn-duplicate" onclick="dupliquerPieceCourante()">📋 Dupliquer</button>
                 <button class="btn-delete-modal" onclick="supprimerPieceCourante()">🗑️ Supprimer</button>
             </div>
@@ -533,12 +563,10 @@
             setTimeout(() => { notif.style.display = 'none'; }, 2000);
         }
 
-        /* Gestion du menu à tiroir */
         function basculerMenu() {
             const drawer = document.getElementById('appDrawer');
             const overlay = document.getElementById('drawerOverlay');
-            const isOpen = drawer.classList.contains('open');
-            if (isOpen) {
+            if (drawer.classList.contains('open')) {
                 fermerMenu();
             } else {
                 drawer.classList.add('open');
@@ -551,7 +579,6 @@
             document.getElementById('drawerOverlay').style.display = 'none';
         }
 
-        /* Gestion des fenêtres modales */
         function ouvrirModalAjout() { fermerMenu(); document.getElementById('modalAjout').style.display = 'flex'; }
         function fermerModalAjout() { document.getElementById('modalAjout').style.display = 'none'; }
 
@@ -616,7 +643,7 @@
                                 <span class="piece-ref">${p.reference}</span>
                                 <div class="piece-name">${p.nom}</div>
                             </div>
-                            <span style="font-size:0.8rem; color:var(--text-muted);">Modifier ✏️</span>
+                            <span style="font-size:0.8rem; color:var(--text-muted);">Gérer ✏️</span>
                         </div>
                         <div class="piece-details">
                             <div>📍 ${p.emplacement || 'Non classé'}</div>
@@ -640,19 +667,56 @@
             const p = toutesLesPieces.find(item => item.id === id);
             if (!p) return;
 
-            document.getElementById('mod_id').value = p.id;
             document.getElementById('mod_reference').value = p.reference;
             document.getElementById('mod_nom').value = p.nom;
             document.getElementById('mod_emplacement').value = p.emplacement || '';
             document.getElementById('mod_fournisseur_id').value = p.fournisseur_id || '';
             document.getElementById('mod_quantite').value = p.quantite;
             document.getElementById('mod_seuil_alerte').value = p.seuil_alerte;
+            document.getElementById('mouvement_quantite').value = 1;
 
             document.getElementById('modalDetails').style.display = 'flex';
         }
 
+        // Valider un mouvement d'entrée ou de sortie rapide
+        function validerMouvement() {
+            const type = document.getElementById('mouvement_type').value;
+            const qteMvt = parseInt(document.getElementById('mouvement_quantite').value);
+            const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
+            if (!p || isNaN(qteMvt) || qteMvt <= 0) return;
+
+            let nouvelleQuantite = type === 'ENTREE' ? p.quantite + qteMvt : p.quantite - qteMvt;
+            if (nouvelleQuantite < 0) nouvelleQuantite = 0;
+
+            const data = {
+                reference: p.reference,
+                nom: p.nom,
+                emplacement: p.emplacement,
+                quantite: nouvelleQuantite,
+                seuil_alerte: p.seuil_alerte,
+                fournisseur_id: p.fournisseur_id,
+                mouvement: {
+                    type: type,
+                    quantite: qteMvt
+                }
+            };
+
+            fetch(`/api/pieces/${idPieceEnCours}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                fermerModaleDetails();
+                chargerPieces();
+                montrerNotification(`Mouvement enregistré (${type === 'ENTREE' ? '+' : '-'}${qteMvt}) !`);
+            });
+        }
+
         function modifierPieceComplete(e) {
             e.preventDefault();
+            const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
             const data = {
                 reference: document.getElementById('mod_reference').value,
                 nom: document.getElementById('mod_nom').value,
