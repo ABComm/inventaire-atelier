@@ -1023,8 +1023,7 @@
                     montrerNotification('Fournisseur supprimé.');
                 });
         }
-
-        function chargerTracabilite() {
+function chargerTracabilite() {
             const container = document.getElementById('listeMouvements');
             container.innerHTML = 'Chargement...';
 
@@ -1037,18 +1036,27 @@
                         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun mouvement enregistré.</p>';
                         return;
                     }
-                    mouvements.forEach(m => {
-                        const dateFormatted = new Date(m.date).toLocaleString('fr-FR');
-                        const isEntree = m.type === 'ENTREE';
+
+                    // On parcourt du plus récent au plus ancien si besoin, ou directement
+                    mouvements.slice().reverse().forEach(m => {
+                        let couleurType = '#3b82f6'; 
+                        if (m.type === 'ENTREE' || m.type === 'AJOUT') couleurType = '#22c55e';          
+                        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
+                        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
+                        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';
+                        else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
+
+                        const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
+                        const dateAffichage = m.date ? new Date(m.date).toLocaleString('fr-FR') : 'Date non disponible';
+
                         container.innerHTML += `
-                            <div style="background:var(--bg-color); padding:8px; border-radius:6px; border:1px solid var(--border);">
-                                <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                                    <span>${m.piece_reference || ''} - ${m.piece_nom || 'Pièce inconnue'}</span>
-                                    <span style="color:${isEntree ? 'var(--success)' : 'var(--danger)'};">${isEntree ? '+' : '-'}${m.quantite}</span>
+                            <div style="background:var(--bg-color); padding:10px; border-radius:6px; border:1px solid var(--border); margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
+                                    <span style="font-size: 0.75em; color: var(--text-muted);">${dateAffichage}</span>
                                 </div>
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
-                                    <span>Type: ${m.type}</span>
-                                    <span>${dateFormatted}</span>
+                                <div style="color: var(--text-main); font-size: 0.9em; font-weight: 500;">
+                                    ${textePrincipal}
                                 </div>
                             </div>
                         `;
