@@ -188,7 +188,7 @@ async function chargerPieces() {
     }
 }
 
-function afficherHistorique() {
+window.afficherHistorique = function() {
     const historiqueContainer = document.getElementById('listeHistorique'); 
     if (!historiqueContainer) return;
 
@@ -201,20 +201,16 @@ function afficherHistorique() {
 
     let html = '';
 
-    // On parcourt les mouvements (on peut utiliser .slice().reverse() si on veut voir les plus récents en haut)
-    mouvements.forEach(m => {
-        // 1. Définition de la couleur selon le type d'action
-        let couleurType = '#3b82f6'; // Bleu par défaut
-        if (m.type === 'AJOUT') couleurType = '#22c55e';          // Vert
-        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; // Rouge
-        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; // Violet
-        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';// Orange
-        else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; // Cyan
+    // Utilisation de .slice().reverse() pour voir les mouvements les plus récents en haut si vous le souhaitez
+    mouvements.slice().reverse().forEach(m => {
+        let couleurType = '#3b82f6'; 
+        if (m.type === 'AJOUT') couleurType = '#22c55e';          
+        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
+        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
+        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';
+        else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
 
-        // 2. Texte principal (on utilise le message complet contenu dans "details" s'il existe)
         const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
-
-        // 3. Date (vos dates sont déjà sous format texte "JJ/MM/AAAA HH:MM:SS")
         const dateAffichage = m.date || 'Date non disponible';
 
         html += `
@@ -231,7 +227,7 @@ function afficherHistorique() {
     });
 
     historiqueContainer.innerHTML = html;
-}
+};
 
 // Modifier la quantité
 async function modifierQuantite(id, qteActuelle, delta) {
