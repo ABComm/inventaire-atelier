@@ -1060,44 +1060,51 @@
         }
     </script>
     <script>
-function afficherHistorique() {
-    const historiqueContainer = document.getElementById('listeMouvements'); 
-    if (!historiqueContainer) return;
+    // On s'assure que tout est chargé proprement
+    document.addEventListener("DOMContentLoaded", () => {
+        // Définition globale de la fonction d'affichage
+        window.afficherHistorique = function() {
+            const historiqueContainer = document.getElementById('listeMouvements');
+            if (!historiqueContainer) {
+                console.warn("L'élément #listeMouvements n'est pas encore présent dans le DOM.");
+                return;
+            }
 
-    const mouvements = window.tousLesMouvements || [];
+            const mouvements = window.tousLesMouvements || [];
 
-    if (mouvements.length === 0) {
-        historiqueContainer.innerHTML = '<p style="text-align:center; color: #64748b; padding: 15px;">Aucun historique enregistré.</p>';
-        return;
-    }
+            if (mouvements.length === 0) {
+                historiqueContainer.innerHTML = '<p style="text-align:center; color: #64748b; padding: 15px;">Aucun historique enregistré.</p>';
+                return;
+            }
 
-    let html = '';
-    mouvements.slice().reverse().forEach(m => {
-        let couleurType = '#3b82f6'; 
-        if (m.type === 'AJOUT') couleurType = '#22c55e';          
-        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
-        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
-        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';
-        else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
+            let html = '';
+            mouvements.slice().reverse().forEach(m => {
+                let couleurType = '#3b82f6'; 
+                if (m.type === 'AJOUT') couleurType = '#22c55e';          
+                else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
+                else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
+                else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';
+                else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
 
-        const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
-        const dateAffichage = m.date || 'Date non disponible';
+                const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
+                const dateAffichage = m.date || 'Date non disponible';
 
-        html += `
-            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); margin-bottom: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
-                    <span style="font-size: 0.75em; color: #94a3b8;">${dateAffichage}</span>
-                </div>
-                <div style="color: #1e293b; font-size: 0.9em; font-weight: 500;">
-                    ${textePrincipal}
-                </div>
-            </div>
-        `;
+                html += `
+                    <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
+                            <span style="font-size: 0.75em; color: #94a3b8;">${dateAffichage}</span>
+                        </div>
+                        <div style="color: #1e293b; font-size: 0.9em; font-weight: 500;">
+                            ${textePrincipal}
+                        </div>
+                    </div>
+                `;
+            });
+
+            historiqueContainer.innerHTML = html;
+        };
     });
-
-    historiqueContainer.innerHTML = html;
-}
 </script>
 </body>
 </html>
