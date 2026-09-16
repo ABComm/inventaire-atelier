@@ -1039,14 +1039,14 @@ function chargerTracabilite() {
 
                     // .reverse() pour afficher les plus récents en haut
                     mouvements.forEach(m => {
-                        // Remplacement et amélioration du texte des modifications / mouvements
-                        if (textePrincipal.startsWith("Mise à jour complète de la pièce")) {
-                            typeAffichage = " MOUVEMENT";
-                            textePrincipal = textePrincipal.replace("Mise à jour complète de la pièce", "Mise à jour et mouvement de stock pour");
-                        } else if (m.type === 'ENTREE') {
-                            typeAffichage = "ENTRÉE";
-                        } else if (m.type === 'SORTIE') {
-                            typeAffichage = "SORTIE";
+                        let typeAffichage = m.type;
+                        let textePrincipal = m.details || '';
+
+                        // Détection affinée pour afficher Entrée / Sortie proprement
+                        if (textePrincipal.toLowerCase().includes('entrée') || m.type === 'ENTREE') {
+                            typeAffichage = 'ENTRÉE';
+                        } else if (textePrincipal.toLowerCase().includes('sortie') || m.type === 'SORTIE') {
+                            typeAffichage = 'SORTIE';
                         }
 
                         let couleurType = '#3b82f6'; 
