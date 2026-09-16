@@ -1038,7 +1038,7 @@ function chargerTracabilite() {
                     }
 
                     // .reverse() pour afficher les plus récents en haut
-                    mouvements.reverse().forEach(m => {
+                    mouvements.forEach(m => {
                         let typeAffichage = m.type;
                         let textePrincipal = m.details || '';
 
