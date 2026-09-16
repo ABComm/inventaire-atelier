@@ -346,6 +346,22 @@ app.post('/api/pieces/:id/dupliquer', async (req, res) => {
     }
 });
 
+// --- ROUTE DE CONNEXION ---
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Identifiants configurés
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = 'atelier2026';
+
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        // On renvoie un "token" simple pour valider la session
+        res.json({ success: true, token: 'token_atelier_meca_secure_2026' });
+    } else {
+        res.status(401).json({ success: false, error: 'Identifiant ou mot de passe incorrect' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });

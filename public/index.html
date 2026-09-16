@@ -34,6 +34,47 @@
             padding-bottom: 50px;
         }
 
+        /* Écran de connexion (Login) */
+        #loginOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+
+        .login-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        #loginError {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: none;
+        }
+
         header {
             text-align: center;
             margin-bottom: 20px;
@@ -62,7 +103,7 @@
             font-size: 0.9rem;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
+            z-index: 3000;
         }
 
         .actions-bar {
@@ -234,7 +275,7 @@
             text-align: center;
         }
 
-        /* Fenêtre Modale (Fiche détail / modification) */
+        /* Modale */
         #modalDetails {
             display: none;
             position: fixed;
@@ -262,10 +303,6 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-        }
-
-        .modal-header h2 {
-            font-size: 1.2rem;
         }
 
         .btn-close {
@@ -322,9 +359,40 @@
             display: none;
             margin-top: 10px;
         }
+
+        .logout-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .btn-logout {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ÉCRAN DE CONNEXION -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>🔐 Connexion Atelier</h2>
+            <p>Veuillez vous identifier pour accéder au stock</p>
+            <div id="loginError">Identifiant ou mot de passe incorrect</div>
+            <form onsubmit="connecter(event)">
+                <div class="form-group">
+                    <input type="text" id="loginUser" placeholder="Identifiant" required>
+                </div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <input type="password" id="loginPass" placeholder="Mot de passe" required>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 15px;">Se connecter</button>
+            </form>
+        </div>
+    </div>
 
     <div id="notification">Action réussie !</div>
 
@@ -338,7 +406,7 @@
         <button class="btn-pdf" onclick="window.open('/api/export/pdf', '_blank')">PDF</button>
     </div>
 
-    <!-- Formulaire d'ajout rapide -->
+    <!-- Formulaire d'ajout -->
     <div class="card">
         <h2>Ajouter une nouvelle pièce</h2>
         <form id="formPiece" onsubmit="ajouterPiece(event)">
@@ -364,7 +432,7 @@
 
     <div class="pieces-list" id="listePieces"></div>
 
-    <!-- FENÊTRE MODALE DE MODIFICATION / DETAILS -->
+    <!-- MODALE DE MODIFICATION -->
     <div id="modalDetails" onclick="fermerModaleExterieur(event)">
         <div class="modal-content">
             <div class="modal-header">
@@ -411,7 +479,7 @@
         </div>
     </div>
 
-    <!-- Gestion des fournisseurs -->
+    <!-- Fournisseurs -->
     <div class="toggle-section">
         <button class="toggle-btn" onclick="toggleFournisseurs()">⚙️ Gérer les fournisseurs</button>
     </div>
@@ -426,9 +494,60 @@
         <div id="listeFournisseurs" style="margin-top: 15px;"></div>
     </div>
 
+    <!-- Déconnexion -->
+    <div class="logout-container">
+        <button class="btn-logout" onclick="deconnecter()">Verrouiller / Se déconnecter de cet appareil</button>
+    </div>
+
     <script>
         let toutesLesPieces = [];
         let idPieceEnCours = null;
+
+        // Vérification de la session au chargement
+        window.onload = function() {
+            const token = localStorage.getItem('atelier_token');
+            if (!token) {
+                document.getElementById('loginOverlay').style.display = 'flex';
+            } else {
+                chargerDonnees();
+            }
+        };
+
+        function connecter(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('atelier_token', data.token);
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('loginError').style.display = 'none';
+                    chargerDonnees();
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            })
+            .catch(() => {
+                document.getElementById('loginError').style.display = 'block';
+            });
+        }
+
+        function deconnecter() {
+            localStorage.removeItem('atelier_token');
+            location.reload();
+        }
+
+        function chargerDonnees() {
+            chargerPieces();
+            chargerSelectFournisseurs();
+        }
 
         function montrerNotification(message) {
             const notif = document.getElementById('notification');
@@ -442,11 +561,6 @@
             container.style.display = container.style.display === 'block' ? 'none' : 'block';
             if(container.style.display === 'block') chargerFournisseurs();
         }
-
-        window.onload = function() {
-            chargerPieces();
-            chargerSelectFournisseurs();
-        };
 
         function chargerSelectFournisseurs() {
             fetch('/api/fournisseurs')
