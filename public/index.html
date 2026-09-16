@@ -1036,15 +1036,28 @@ function chargerTracabilite() {
                         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun mouvement enregistré.</p>';
                         return;
                     }
-                    mouvements.forEach(m => {
-                        let couleurType = '#3b82f6'; 
-                        if (m.type === 'ENTREE' || m.type === 'AJOUT') couleurType = '#22c55e';          
-                        else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
-                        else if (m.type === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
-                        else if (m.type === 'MODIFICATION') couleurType = '#f59e0b';
-                        else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
 
-                        const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
+                    // .reverse() pour afficher les plus récents en haut
+                    mouvements.reverse().forEach(m => {
+                        let typeAffichage = m.type;
+                        let textePrincipal = m.details || '';
+
+                        // Détection affinée pour afficher Entrée / Sortie proprement
+                        if (textePrincipal.toLowerCase().includes('entrée') || m.type === 'ENTREE') {
+                            typeAffichage = 'ENTRÉE';
+                        } else if (textePrincipal.toLowerCase().includes('sortie') || m.type === 'SORTIE') {
+                            typeAffichage = 'SORTIE';
+                        }
+
+                        let couleurType = '#3b82f6'; 
+                        if (typeAffichage === 'ENTREE' || typeAffichage === 'AJOUT') couleurType = '#22c55e';          
+                        else if (typeAffichage === 'SORTIE') couleurType = '#f97316'; // Orange vif pour les sorties
+                        else if (typeAffichage === 'SUPPRESSION') couleurType = '#ef4444'; 
+                        else if (typeAffichage === 'FOURNISSEUR') couleurType = '#8b5cf6'; 
+                        else if (typeAffichage === 'MODIFICATION') couleurType = '#f59e0b';
+                        else if (typeAffichage === 'DUPLICATION') couleurType = '#06b6d4'; 
+
+                        const texteFinal = textePrincipal || `Action de type ${m.type} (ID: ${m.id})`;
                         
                         // Correction de la lecture de la date (remplacement de l'espace par 'T' pour JS)
                         let dateAffichage = 'Date non disponible';
@@ -1061,11 +1074,11 @@ function chargerTracabilite() {
                         container.innerHTML += `
                             <div style="background:var(--bg-color); padding:10px; border-radius:6px; border:1px solid var(--border); margin-bottom: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${m.type}</span>
+                                    <span style="font-size: 0.75em; font-weight: bold; padding: 2px 8px; border-radius: 4px; background: ${couleurType}20; color: ${couleurType};">${typeAffichage}</span>
                                     <span style="font-size: 0.75em; color: var(--text-muted);">${dateAffichage}</span>
                                 </div>
                                 <div style="color: var(--text-main); font-size: 0.9em; font-weight: 500;">
-                                    ${textePrincipal}
+                                    ${texteFinal}
                                 </div>
                             </div>
                         `;
