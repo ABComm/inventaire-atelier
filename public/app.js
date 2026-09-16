@@ -278,7 +278,12 @@ async function chargerTableauDeBord() {
             fetch('/api/mouvements').then(r => r.json()).catch(() => [])
         ]);
 
-        // Mise à jour de la variable globale au passage
+        // Tri des pièces récupérées pour le tableau de bord aussi
+        resPieces.sort((a, b) => {
+            const nomA = a.nom ? a.nom.toLowerCase() : '';
+            const nomB = b.nom ? b.nom.toLowerCase() : '';
+            return nomA.localeCompare(nomB, 'fr', { sensitivity: 'base' });
+        });
         toutesLesPieces = resPieces;
 
         // 1. Calculs des KPIs
