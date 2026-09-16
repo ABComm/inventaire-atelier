@@ -4,7 +4,7 @@ let toutesLesPieces = [];
 document.addEventListener('DOMContentLoaded', () => {
     chargerFournisseurs();
     chargerPieces();
-    chargerMouvements();
+    chargerEtAfficherMouvements();
 
     // Gestion du formulaire d'ajout de fournisseur
     const formFournisseur = document.getElementById('fournisseur-form');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (res.ok) {
                     formPiece.reset();
                     chargerPieces();
-                    chargerMouvements();
+                    chargerEtAfficherMouvements();
                 } else {
                     const errData = await res.json();
                     alert('Erreur lors de l\'ajout de la pièce : ' + (errData.error || 'Référence déjà existante ou champ invalide'));
@@ -106,7 +106,7 @@ function changerOnglet(nomOnglet) {
     } else if (nomOnglet === 'traçabilite') {
         if (ongletTracabilite) ongletTracabilite.classList.add('active');
         if (document.querySelectorAll('.tab-btn')[2]) document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        chargerMouvements();
+        chargerEtAfficherMouvements();
     }
 }
 
@@ -257,7 +257,7 @@ async function modifierQuantite(id, qteActuelle, delta) {
 
         if (res.ok) {
             chargerPieces();
-            chargerMouvements();
+            chargerEtAfficherMouvements();
         }
     } catch (err) {
         console.error('Erreur modification quantité', err);
@@ -271,7 +271,7 @@ async function supprimerPiece(id) {
             const res = await fetch(`/api/pieces/${id}`, { method: 'DELETE' });
             if (res.ok) {
                 chargerPieces();
-                chargerMouvements();
+                chargerEtAfficherMouvements();
             }
         } catch (err) {
             console.error('Erreur suppression pièce', err);
