@@ -11,6 +11,7 @@
             --danger: #dc2626;
             --danger-bg: #fee2e2;
             --success: #16a34a;
+            --warning-bg: #fef3c7;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -334,6 +335,38 @@
             border-radius: 10px;
             margin-bottom: 15px;
         }
+
+        /* Styles spécifiques pour le Tableau de Bord & KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .kpi-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .kpi-card.warning { background-color: var(--warning-bg); border-color: #fde047; }
+        .kpi-card.danger { background-color: var(--danger-bg); border-color: #fca5a5; }
+        .kpi-icon { font-size: 1.5rem; }
+        .kpi-info { display: flex; flex-direction: column; }
+        .kpi-value { font-size: 1.2rem; font-weight: 700; }
+        .kpi-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        .reappro-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -388,61 +421,61 @@
     <div class="pieces-list" id="listePieces"></div>
 
     <!-- MODALE : TABLEAU DE BORD -->
-<div id="modalTableauDeBord" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalTableauDeBord')">
-    <div class="modal-content" style="max-width: 550px;">
-        <div class="modal-header">
-            <h2>📊 Tableau de Bord</h2>
-            <button class="btn-close" onclick="fermerModalTableauDeBord()">&times;</button>
-        </div>
+    <div id="modalTableauDeBord" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalTableauDeBord')">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>📊 Tableau de Bord</h2>
+                <button class="btn-close" onclick="fermerModalTableauDeBord()">&times;</button>
+            </div>
 
-        <!-- Indicateurs clés (KPIs) -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <span class="kpi-icon">📦</span>
-                <div class="kpi-info">
-                    <span class="kpi-value" id="kpi-total">0</span>
-                    <span class="kpi-label">Références</span>
+            <!-- Indicateurs clés (KPIs) -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-icon">📦</span>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpi-total">0</span>
+                        <span class="kpi-label">Références</span>
+                    </div>
+                </div>
+                <div class="kpi-card warning">
+                    <span class="kpi-icon">🔴</span>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpi-faible">0</span>
+                        <span class="kpi-label">Stock faible</span>
+                    </div>
+                </div>
+                <div class="kpi-card danger">
+                    <span class="kpi-icon">⛔</span>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpi-ruptures">0</span>
+                        <span class="kpi-label">Ruptures</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-icon">🤝</span>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpi-fournisseurs">0</span>
+                        <span class="kpi-label">Fournisseurs</span>
+                    </div>
+                </div>
+                <div class="kpi-card" style="grid-column: span 2;">
+                    <span class="kpi-icon">📋</span>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpi-mouvements">0</span>
+                        <span class="kpi-label">Mouvements enregistrés (total)</span>
+                    </div>
                 </div>
             </div>
-            <div class="kpi-card warning">
-                <span class="kpi-icon">🔴</span>
-                <div class="kpi-info">
-                    <span class="kpi-value" id="kpi-faible">0</span>
-                    <span class="kpi-label">Stock faible</span>
-                </div>
-            </div>
-            <div class="kpi-card danger">
-                <span class="kpi-icon">⛔</span>
-                <div class="kpi-info">
-                    <span class="kpi-value" id="kpi-ruptures">0</span>
-                    <span class="kpi-label">Ruptures</span>
-                </div>
-            </div>
-            <div class="kpi-card">
-                <span class="kpi-icon">🤝</span>
-                <div class="kpi-info">
-                    <span class="kpi-value" id="kpi-fournisseurs">0</span>
-                    <span class="kpi-label">Fournisseurs</span>
-                </div>
-            </div>
-            <div class="kpi-card">
-                <span class="kpi-icon">📋</span>
-                <div class="kpi-info">
-                    <span class="kpi-value" id="kpi-mouvements">0</span>
-                    <span class="kpi-label">Mouvements du jour</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- Bloc : À réapprovisionner en urgence -->
-        <div class="reappro-section" style="margin-top: 15px;">
-            <h3>🔴 À réapprovisionner</h3>
-            <div class="reappro-list" id="listeReappro" style="max-height: 200px; overflow-y: auto;">
-                <!-- Injecté dynamiquement par JavaScript -->
+            <!-- Bloc : À réapprovisionner en urgence -->
+            <div class="reappro-section" style="margin-top: 15px;">
+                <h3>🔴 À réapprovisionner</h3>
+                <div class="reappro-list" id="listeReappro" style="max-height: 200px; overflow-y: auto; margin-top: 8px;">
+                    <!-- Injecté dynamiquement par JavaScript -->
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- MODALE : AJOUTER UNE PIÈCE -->
     <div id="modalAjout" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalAjout')">
@@ -573,6 +606,8 @@
 
     <script>
         let toutesLesPieces = [];
+        let tousLesFournisseurs = [];
+        let tousLesMouvements = [];
         let idPieceEnCours = null;
 
         window.onload = function() {
@@ -615,7 +650,8 @@
 
         function chargerDonnees() {
             chargerPieces();
-            chargerSelectFournisseurs();
+            chargerFournisseursSilencieux();
+            chargerTracabiliteSilencieux();
         }
 
         function montrerNotification(message, estErreur = false) {
@@ -659,6 +695,13 @@
         }
         function fermerModalTracabilite() { document.getElementById('modalTracabilite').style.display = 'none'; }
 
+        function ouvrirModalTableauDeBord() {
+            fermerMenu();
+            calculerEtAfficherDashboard();
+            document.getElementById('modalTableauDeBord').style.display = 'flex';
+        }
+        function fermerModalTableauDeBord() { document.getElementById('modalTableauDeBord').style.display = 'none'; }
+
         function fermerModaleDetails() { document.getElementById('modalDetails').style.display = 'none'; }
 
         function fermerModaleExterieur(event, idModal) {
@@ -671,6 +714,7 @@
             fetch('/api/fournisseurs')
                 .then(res => res.json())
                 .then(fournisseurs => {
+                    tousLesFournisseurs = fournisseurs;
                     const selects = document.querySelectorAll('.select-fournisseur');
                     selects.forEach(select => {
                         const valeurActuelle = select.value;
@@ -683,6 +727,12 @@
                 });
         }
 
+        function chargerFournisseursSilencieux() {
+            fetch('/api/fournisseurs')
+                .then(res => res.json())
+                .then(fournisseurs => { tousLesFournisseurs = fournisseurs; });
+        }
+
         function chargerPieces() {
             fetch('/api/pieces')
                 .then(res => res.json())
@@ -690,6 +740,13 @@
                     toutesLesPieces = pieces;
                     afficherPieces(pieces);
                 });
+        }
+
+        function chargerTracabiliteSilencieux() {
+            fetch('/api/mouvements')
+                .then(res => res.json())
+                .then(mouvements => { tousLesMouvements = mouvements; })
+                .catch(() => {});
         }
 
         function afficherPieces(pieces) {
@@ -729,6 +786,51 @@
             });
         }
 
+        function filtrerPieces() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const piecesFiltrees = toutesLesPieces.filter(p => 
+                p.nom.toLowerCase().includes(query) || 
+                p.reference.toLowerCase().includes(query) || 
+                (p.emplacement && p.emplacement.toLowerCase().includes(query))
+            );
+            afficherPieces(piecesFiltrees);
+        }
+
+        function calculerEtAfficherDashboard() {
+            const totalReferences = toutesLesPieces.length;
+            let stockFaible = 0;
+            let ruptures = 0;
+            let listeReapproHtml = '';
+
+            toutesLesPieces.forEach(p => {
+                if (p.quantite === 0) {
+                    ruptures++;
+                } else if (p.quantite <= p.seuil_alerte) {
+                    stockFaible++;
+                }
+
+                if (p.quantite <= p.seuil_alerte) {
+                    listeReapproHtml += `
+                        <div class="reappro-item">
+                            <div><strong>${p.reference}</strong> - ${p.nom}</div>
+                            <div style="color: var(--danger); font-weight: bold;">Qté: ${p.quantite} (Seuil: ${p.seuil_alerte})</div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (listeReapproHtml === '') {
+                listeReapproHtml = '<p style="text-align:center; color:var(--text-muted); padding:10px;">Aucune pièce en alerte de stock.</p>';
+            }
+
+            document.getElementById('kpi-total').innerText = totalReferences;
+            document.getElementById('kpi-faible').innerText = stockFaible;
+            document.getElementById('kpi-ruptures').innerText = ruptures;
+            document.getElementById('kpi-fournisseurs').innerText = tousLesFournisseurs.length;
+            document.getElementById('kpi-mouvements').innerText = tousLesMouvements.length;
+            document.getElementById('listeReappro').innerHTML = listeReapproHtml;
+        }
+
         function ouvrirModaleDetails(id) {
             idPieceEnCours = id;
             const p = toutesLesPieces.find(item => item.id === id);
@@ -745,14 +847,12 @@
             document.getElementById('modalDetails').style.display = 'flex';
         }
 
-        // Valider un mouvement d'entrée ou de sortie avec blocage strict du stock négatif
         function validerMouvement() {
             const type = document.getElementById('mouvement_type').value;
             const qteMvt = parseInt(document.getElementById('mouvement_quantite').value);
             const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
             if (!p || isNaN(qteMvt) || qteMvt <= 0) return;
 
-            // VÉRIFICATION ANTI-STOCK NÉGATIF
             if (type === 'SORTIE' && qteMvt > p.quantite) {
                 montrerNotification(`Stock insuffisant. Stock disponible : ${p.quantite}`, true);
                 return;
@@ -782,6 +882,7 @@
             .then(() => {
                 fermerModaleDetails();
                 chargerPieces();
+                chargerTracabiliteSilencieux();
                 montrerNotification(`Mouvement enregistré (${type === 'ENTREE' ? '+' : '-'}${qteMvt}) !`);
             });
         }
@@ -813,40 +914,8 @@
             .then(() => {
                 fermerModaleDetails();
                 chargerPieces();
-                montrerNotification('Modifications enregistrées !');
+                montrerNotification('Modifications enregistrées avec succès !');
             });
-        }
-
-        function dupliquerPieceCourante() {
-            fetch(`/api/pieces/${idPieceEnCours}/dupliquer`, { method: 'POST' })
-                .then(res => res.json())
-                .then(() => {
-                    fermerModaleDetails();
-                    chargerPieces();
-                    montrerNotification('Pièce dupliquée avec succès !');
-                });
-        }
-
-        function supprimerPieceCourante() {
-            if (confirm("Voulez-vous vraiment supprimer cette pièce ?")) {
-                fetch(`/api/pieces/${idPieceEnCours}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(() => {
-                        fermerModaleDetails();
-                        chargerPieces();
-                        montrerNotification('Pièce supprimée.');
-                    });
-            }
-        }
-
-        function filtrerPieces() {
-            const recherche = document.getElementById('searchInput').value.toLowerCase();
-            const piecesFiltrees = toutesLesPieces.filter(p => 
-                p.nom.toLowerCase().includes(recherche) || 
-                p.reference.toLowerCase().includes(recherche) ||
-                (p.emplacement && p.emplacement.toLowerCase().includes(recherche))
-            );
-            afficherPieces(piecesFiltrees);
         }
 
         function ajouterPiece(e) {
@@ -867,28 +936,59 @@
             })
             .then(res => res.json())
             .then(() => {
-                document.getElementById('formPiece').reset();
                 fermerModalAjout();
+                document.getElementById('formPiece').reset();
                 chargerPieces();
                 montrerNotification('Pièce ajoutée avec succès !');
             });
+        }
+
+        function supprimerPieceCourante() {
+            if (!confirm('Voulez-vous vraiment supprimer cette pièce ?')) return;
+
+            fetch(`/api/pieces/${idPieceEnCours}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    fermerModaleDetails();
+                    chargerPieces();
+                    montrerNotification('Pièce supprimée.');
+                });
+        }
+
+        function dupliquerPieceCourante() {
+            const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
+            if (!p) return;
+
+            document.getElementById('reference').value = p.reference + '-COPIE';
+            document.getElementById('nom').value = p.nom + ' (Copie)';
+            document.getElementById('emplacement').value = p.emplacement || '';
+            document.getElementById('fournisseur_id').value = p.fournisseur_id || '';
+            document.getElementById('quantite').value = p.quantite;
+            document.getElementById('seuil_alerte').value = p.seuil_alerte;
+
+            fermerModaleDetails();
+            ouvrirModalAjout();
         }
 
         function chargerFournisseurs() {
             fetch('/api/fournisseurs')
                 .then(res => res.json())
                 .then(fournisseurs => {
-                    const div = document.getElementById('listeFournisseurs');
+                    tousLesFournisseurs = fournisseurs;
+                    const container = document.getElementById('listeFournisseurs');
+                    container.innerHTML = '';
                     if (fournisseurs.length === 0) {
-                        div.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun fournisseur.</p>';
+                        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun fournisseur enregistré.</p>';
                         return;
                     }
-                    div.innerHTML = fournisseurs.map(f => `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px solid var(--border);">
-                            <div><b>${f.nom}</b> <span style="font-size:0.8rem; color:var(--text-muted);">${f.contact ? '('+f.contact+')' : ''}</span></div>
-                            <button onclick="supprimerFournisseur(${f.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem;">Supprimer</button>
-                        </div>
-                    `).join('');
+                    fournisseurs.forEach(f => {
+                        container.innerHTML += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid var(--border);">
+                                <div><strong>${f.nom}</strong><br><small style="color:var(--text-muted);">${f.contact || 'Pas de contact'}</small></div>
+                                <button onclick="supprimerFournisseur(${f.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.1rem;">🗑️</button>
+                            </div>
+                        `;
+                    });
                 });
         }
 
@@ -914,38 +1014,48 @@
         }
 
         function supprimerFournisseur(id) {
-            if (confirm("Supprimer ce fournisseur ?")) {
-                fetch(`/api/fournisseurs/${id}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(() => {
-                        chargerFournisseurs();
-                        chargerSelectFournisseurs();
-                        montrerNotification('Fournisseur supprimé');
-                    });
-            }
+            if (!confirm('Supprimer ce fournisseur ?')) return;
+            fetch(`/api/fournisseurs/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    chargerFournisseurs();
+                    chargerSelectFournisseurs();
+                    montrerNotification('Fournisseur supprimé.');
+                });
         }
 
         function chargerTracabilite() {
+            const container = document.getElementById('listeMouvements');
+            container.innerHTML = 'Chargement...';
+
             fetch('/api/mouvements')
-                .then(res => res ? res.json() : [])
+                .then(res => res.json())
                 .then(mouvements => {
-                    const div = document.getElementById('listeMouvements');
-                    if (!mouvements || mouvements.length === 0) {
-                        div.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun mouvement enregistré.</p>';
+                    tousLesMouvements = mouvements;
+                    container.innerHTML = '';
+                    if (mouvements.length === 0) {
+                        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun mouvement enregistré.</p>';
                         return;
                     }
-                    div.innerHTML = mouvements.map(m => `
-                        <div style="padding: 8px; background: var(--bg-color); border-radius: 6px; border: 1px solid var(--border);">
-                            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--primary); font-size:0.8rem;">
-                                <span>${m.type}</span>
-                                <span style="color:var(--text-muted); font-weight:normal;">${new Date(m.date).toLocaleString()}</span>
+                    mouvements.forEach(m => {
+                        const dateFormatted = new Date(m.date).toLocaleString('fr-FR');
+                        const isEntree = m.type === 'ENTREE';
+                        container.innerHTML += `
+                            <div style="background:var(--bg-color); padding:8px; border-radius:6px; border:1px solid var(--border);">
+                                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                                    <span>${m.piece_reference || ''} - ${m.piece_nom || 'Pièce inconnue'}</span>
+                                    <span style="color:${isEntree ? 'var(--success)' : 'var(--danger)'};">${isEntree ? '+' : '-'}${m.quantite}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
+                                    <span>Type: ${m.type}</span>
+                                    <span>${dateFormatted}</span>
+                                </div>
                             </div>
-                            <div style="margin-top:2px;">${m.description}</div>
-                        </div>
-                    `).join('');
+                        `;
+                    });
                 })
                 .catch(() => {
-                    document.getElementById('listeMouvements').innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun mouvement enregistré.</p>';
+                    container.innerHTML = '<p style="text-align:center; color:var(--danger);">Erreur de chargement de l\'historique.</p>';
                 });
         }
     </script>
