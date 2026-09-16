@@ -189,55 +189,199 @@ async function chargerPieces() {
 }
 
 function afficherHistorique() {
-    const historiqueContainer = document.getElementById('listeHistorique'); 
+    const historiqueContainer = document.getElementById('listeHistorique');
+
     if (!historiqueContainer) return;
 
     const mouvements = window.tousLesMouvements || [];
 
-    if (mouvements.length === 0) {
-        historiqueContainer.innerHTML = '<p style="text-align:center; color: #64748b; padding: 15px;">Aucun historique enregistré.</p>';
+    if (!Array.isArray(mouvements) || mouvements.length === 0) {
+        historiqueContainer.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#64748b;
+                padding:15px;
+            ">
+                Aucun historique enregistré.
+            </p>
+        `;
         return;
     }
 
     let html = '';
 
     mouvements.forEach(m => {
-        // Recherche intelligente de la pièce (si m.id ne correspond pas directement à une pièce, on cherche par pieceId ou on prend le texte des détails)
-        let piece = toutesLesPieces.find(p => p.id == m.id || p.id == m.pieceId);
-        
-        let nomPieceAffiche = "Action globale / Système";
+
+        // ==========================================
+        // 1. IDENTIFIER LA PIÈCE
+        // ==========================================
+
+        let piece = null;
+
+        // Cas où l'API possède directement un ID de pièce
+        const pieceId =
+            m.pieceId ??
+            m.piece_id ??
+            m.id_piece ??
+            m.idPiece ??
+            null;
+
+        if (pieceId !== null) {
+            piece = toutesLesPieces.find(
+                p => String(p.id) === String(pieceId)
+            );
+        }
+
+        // ==========================================
+        // 2. SI PAS D'ID : chercher la référence
+        //    dans "details"
+        // ==========================================
+
+        if (!piece && m.details) {
+
+            const matchReference =
+                m.details.match(/\[([^\]]+)\]/);
+
+            if (matchReference) {
+
+                const reference =
+                    matchReference[1];
+
+                piece = toutesLesPieces.find(
+                    p =>
+                        String(p.reference).toLowerCase() ===
+                        String(reference).toLowerCase()
+                );
+            }
+        }
+
+        // ==========================================
+        // 3. NOM DE LA PIÈCE
+        // ==========================================
+
+        let nomPieceAffiche = 'Action système';
+
         if (piece) {
-            nomPieceAffiche = `${piece.reference} - ${piece.nom}`;
-        } else if (m.details && typeof m.details === 'string') {
-            // Extrait un bout de texte des détails si la pièce n'est pas trouvée par ID direct
+
+            nomPieceAffiche =
+                `${piece.reference} - ${piece.nom}`;
+
+        } else if (m.details) {
+
+            // On utilise les détails si la pièce
+            // n'existe plus dans le stock
             nomPieceAffiche = m.details;
+
         }
 
-        // Gestion propre de la quantité ou du type
-        let qteAffichee = m.quantite !== undefined ? m.quantite : '';
-        let couleurQte = '#ef4444';
-        
-        if (qteAffichee !== '') {
-            const signe = qteAffichee >= 0 ? '+' : '';
-            qteAffichee = `${signe}${qteAffichee}`;
-            couleurQte = qteAffichee >= 0 ? '#22c55e' : '#ef4444';
-        } else {
-            qteAffichee = m.type || 'INFO';
+        // ==========================================
+        // 4. QUANTITÉ
+        // ==========================================
+
+        let qteAffichee = '—';
+        let couleurQte = '#64748b';
+
+        if (
+            m.quantite !== undefined &&
+            m.quantite !== null
+        ) {
+
+            const quantite = Number(m.quantite);
+
+            if (!isNaN(quantite)) {
+
+                qteAffichee =
+                    quantite > 0
+                        ? `+${quantite}`
+                        : `${quantite}`;
+
+                couleurQte =
+                    quantite > 0
+                        ? '#22c55e'
+                        : quantite < 0
+                            ? '#ef4444'
+                            : '#64748b';
+            }
         }
 
-        // Date propre (vos dates sont déjà en format texte "JJ/MM/AAAA HH:MM:SS")
-        const dateAffichage = m.date || 'Date non disponible';
+        // ==========================================
+        // 5. TYPE
+        // ==========================================
+
+        const type =
+            m.type ||
+            'INFORMATION';
+
+        // ==========================================
+        // 6. DATE
+        // ==========================================
+
+        // L'API renvoie déjà :
+        // "16/09/2026 17:09:34"
+        //
+        // On l'affiche directement.
+
+        const dateAffichage =
+            m.date ||
+            'Date non disponible';
+
+        // ==========================================
+        // 7. AFFICHAGE
+        // ==========================================
 
         html += `
-            <div style="background: #fff; border: 1px solid #e2e8f0; padding: 12px; margin-bottom: 8px; border-radius: 6px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <strong style="color: #1e293b; font-size: 0.95em;">${nomPieceAffiche}</strong>
-                    <span style="color: ${couleurQte}; font-weight: bold; font-size: 0.9em;">${qteAffichee}</span>
+            <div style="
+                background:#fff;
+                border:1px solid #e2e8f0;
+                padding:12px;
+                margin-bottom:8px;
+                border-radius:6px;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:4px;
+                    gap:10px;
+                ">
+
+                    <strong style="
+                        color:#1e293b;
+                        font-size:0.95em;
+                    ">
+                        ${nomPieceAffiche}
+                    </strong>
+
+                    <span style="
+                        color:${couleurQte};
+                        font-weight:bold;
+                        font-size:0.9em;
+                        white-space:nowrap;
+                    ">
+                        ${qteAffichee}
+                    </span>
+
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #64748b; margin-top: 6px;">
-                    <span>Type: ${m.type || 'MODIFICATION'}</span>
-                    <span>${dateAffichage}</span>
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    font-size:0.8em;
+                    color:#64748b;
+                    margin-top:6px;
+                ">
+
+                    <span>
+                        Type : ${type}
+                    </span>
+
+                    <span>
+                        ${dateAffichage}
+                    </span>
+
                 </div>
+
             </div>
         `;
     });
