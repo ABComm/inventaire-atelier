@@ -1036,7 +1036,7 @@ function chargerTracabilite() {
                         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun mouvement enregistré.</p>';
                         return;
                     }
-                    mouvements.slice().reverse().forEach(m => {
+                    mouvements.forEach(m => {
                         let couleurType = '#3b82f6'; 
                         if (m.type === 'ENTREE' || m.type === 'AJOUT') couleurType = '#22c55e';          
                         else if (m.type === 'SUPPRESSION') couleurType = '#ef4444'; 
