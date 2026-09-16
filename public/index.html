@@ -1036,8 +1036,6 @@ function chargerTracabilite() {
                         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aucun mouvement enregistré.</p>';
                         return;
                     }
-
-                    // On parcourt du plus récent au plus ancien si besoin, ou directement
                     mouvements.slice().reverse().forEach(m => {
                         let couleurType = '#3b82f6'; 
                         if (m.type === 'ENTREE' || m.type === 'AJOUT') couleurType = '#22c55e';          
@@ -1047,7 +1045,18 @@ function chargerTracabilite() {
                         else if (m.type === 'DUPLICATION') couleurType = '#06b6d4'; 
 
                         const textePrincipal = m.details || `Action de type ${m.type} (ID: ${m.id})`;
-                        const dateAffichage = m.date ? new Date(m.date).toLocaleString('fr-FR') : 'Date non disponible';
+                        
+                        // Correction de la lecture de la date (remplacement de l'espace par 'T' pour JS)
+                        let dateAffichage = 'Date non disponible';
+                        if (m.date) {
+                            const dateCorrige = m.date.replace(' ', 'T');
+                            const dateObj = new Date(dateCorrige);
+                            if (!isNaN(dateObj)) {
+                                dateAffichage = dateObj.toLocaleString('fr-FR');
+                            } else {
+                                dateAffichage = m.date; // Affiche la date brute si le parsing échoue
+                            }
+                        }
 
                         container.innerHTML += `
                             <div style="background:var(--bg-color); padding:10px; border-radius:6px; border:1px solid var(--border); margin-bottom: 8px;">
