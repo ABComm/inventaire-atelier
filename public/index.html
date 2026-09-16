@@ -371,6 +371,7 @@
             <button class="btn-close" onclick="fermerMenu()">&times;</button>
         </div>
         <div class="drawer-links">
+            <button class="drawer-link" onclick="ouvrirModalTableauDeBord()">📊 Tableau de bord</button>
             <button class="drawer-link" onclick="ouvrirModalAjout()">➕ Ajouter une pièce</button>
             <button class="drawer-link" onclick="ouvrirModalFournisseurs()">📦 Gérer les fournisseurs</button>
             <button class="drawer-link" onclick="ouvrirModalTracabilite()">📋 Traçabilité (Historique)</button>
@@ -385,6 +386,63 @@
     </div>
 
     <div class="pieces-list" id="listePieces"></div>
+
+    <!-- MODALE : TABLEAU DE BORD -->
+<div id="modalTableauDeBord" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalTableauDeBord')">
+    <div class="modal-content" style="max-width: 550px;">
+        <div class="modal-header">
+            <h2>📊 Tableau de Bord</h2>
+            <button class="btn-close" onclick="fermerModalTableauDeBord()">&times;</button>
+        </div>
+
+        <!-- Indicateurs clés (KPIs) -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <span class="kpi-icon">📦</span>
+                <div class="kpi-info">
+                    <span class="kpi-value" id="kpi-total">0</span>
+                    <span class="kpi-label">Références</span>
+                </div>
+            </div>
+            <div class="kpi-card warning">
+                <span class="kpi-icon">🔴</span>
+                <div class="kpi-info">
+                    <span class="kpi-value" id="kpi-faible">0</span>
+                    <span class="kpi-label">Stock faible</span>
+                </div>
+            </div>
+            <div class="kpi-card danger">
+                <span class="kpi-icon">⛔</span>
+                <div class="kpi-info">
+                    <span class="kpi-value" id="kpi-ruptures">0</span>
+                    <span class="kpi-label">Ruptures</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-icon">🤝</span>
+                <div class="kpi-info">
+                    <span class="kpi-value" id="kpi-fournisseurs">0</span>
+                    <span class="kpi-label">Fournisseurs</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-icon">📋</span>
+                <div class="kpi-info">
+                    <span class="kpi-value" id="kpi-mouvements">0</span>
+                    <span class="kpi-label">Mouvements du jour</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bloc : À réapprovisionner en urgence -->
+        <div class="reappro-section" style="margin-top: 15px;">
+            <h3>🔴 À réapprovisionner</h3>
+            <div class="reappro-list" id="listeReappro" style="max-height: 200px; overflow-y: auto;">
+                <!-- Injecté dynamiquement par JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- MODALE : AJOUTER UNE PIÈCE -->
     <div id="modalAjout" class="modal-overlay" onclick="fermerModaleExterieur(event, 'modalAjout')">

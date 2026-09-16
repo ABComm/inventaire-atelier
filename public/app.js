@@ -223,3 +223,63 @@ async function supprimerPiece(id) {
         }
     }
 }
+
+function ouvrirModalTableauDeBord() {
+            fermerMenu();
+            document.getElementById('modalTableauDeBord').style.display = 'flex';
+            chargerTableauDeBord(); // Calcule et rafraîchit les chiffres à l'ouverture
+        }
+
+        function fermerModalTableauDeBord() {
+            document.getElementById('modalTableauDeBord').style.display = 'none';
+        }
+
+        async function chargerTableauDeBord() {
+            try {
+                const [resPieces, resFournisseurs, resMouvements] = await Promise.all([
+                    fetch('/api/pieces').then(r => r.json()),
+                    fetch('/api/fournisseurs').then(r => r.json()),
+                    fetch('/api/mouvements').then(r => r.json()).catch(() => [])
+                ]);
+
+                // 1. Calculs des KPIs
+                const totalReferences = resPieces.length;
+                const stockFaible = resPieces.filter(p => p.quantite <= p.seuil_alerte && p.quantite > 0).length;
+                const ruptures = resPieces.filter(p => p.quantite === 0).length;
+                const totalFournisseurs = resFournisseurs.length;
+
+                const aujourdHui = new Date().toISOString().split('T')[0];
+                const mouvementsJour = resMouvements.filter(m => m.date && m.date.startsWith(aujourdHui)).length;
+
+                // Affichage KPIs
+                document.getElementById('kpi-total').innerText = totalReferences;
+                document.getElementById('kpi-faible').innerText = stockFaible;
+                document.getElementById('kpi-ruptures').innerText = ruptures;
+                document.getElementById('kpi-fournisseurs').innerText = totalFournisseurs;
+                document.getElementById('kpi-mouvements').innerText = mouvementsJour;
+
+                // 2. Liste des pièces à réapprovisionner
+                const piecesReappro = resPieces.filter(p => p.quantite <= p.seuil_alerte);
+                const listeReapproDiv = document.getElementById('listeReappro');
+
+                if (piecesReappro.length === 0) {
+                    listeReapproDiv.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem; text-align:center;">Aucune pièce en alerte. Tout est OK ! 👍</p>';
+                    return;
+                }
+
+                listeReapproDiv.innerHTML = piecesReappro.map(p => `
+                    <div class="reappro-item" onclick="fermerModalTableauDeBord(); ouvrirModaleDetails(${p.id})">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="reappro-ref">${p.reference}</span>
+                            <span>${p.nom}</span>
+                        </div>
+                        <div style="font-weight: bold; color: ${p.quantite === 0 ? 'var(--danger)' : '#d97706'};">
+                            ${p.quantite} / ${p.seuil_alerte}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Erreur chargement tableau de bord :", error);
+            }
+        }

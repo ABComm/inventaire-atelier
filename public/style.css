@@ -250,3 +250,58 @@ tr.stock-alerte {
         padding-right: 10px;
     }
 }
+.kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+    }
+
+    .kpi-card {
+        background: var(--bg-color, #f8fafc);
+        border: 1px solid var(--border, #e2e8f0);
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .kpi-icon { font-size: 1.3rem; }
+    .kpi-info { display: flex; flex-direction: column; }
+    .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main, #1e293b); }
+    .kpi-label { font-size: 0.7rem; color: var(--text-muted, #64748b); }
+
+    .reappro-section {
+        background: var(--bg-color, #f8fafc);
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .reappro-section h3 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        color: var(--danger, #dc2626);
+    }
+
+    .reappro-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--border, #e2e8f0);
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .reappro-item:last-child { border-bottom: none; }
+    .reappro-item:hover { background: #ffffff; border-radius: 6px; }
+
+    .reappro-ref {
+        font-weight: 700;
+        font-size: 0.75rem;
+        background: #e2e8f0;
+        padding: 2px 5px;
+        border-radius: 4px;
+        color: #475569;
+    }
