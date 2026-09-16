@@ -162,6 +162,10 @@
             z-index: 4000;
         }
 
+        #notification.error {
+            background: var(--danger);
+        }
+
         .actions-bar {
             display: flex;
             gap: 10px;
@@ -556,11 +560,16 @@
             chargerSelectFournisseurs();
         }
 
-        function montrerNotification(message) {
+        function montrerNotification(message, estErreur = false) {
             const notif = document.getElementById('notification');
             notif.innerText = message;
+            if (estErreur) {
+                notif.classList.add('error');
+            } else {
+                notif.classList.remove('error');
+            }
             notif.style.display = 'block';
-            setTimeout(() => { notif.style.display = 'none'; }, 2000);
+            setTimeout(() => { notif.style.display = 'none'; }, 3000);
         }
 
         function basculerMenu() {
@@ -678,15 +687,20 @@
             document.getElementById('modalDetails').style.display = 'flex';
         }
 
-        // Valider un mouvement d'entrée ou de sortie rapide
+        // Valider un mouvement d'entrée ou de sortie avec blocage strict du stock négatif
         function validerMouvement() {
             const type = document.getElementById('mouvement_type').value;
             const qteMvt = parseInt(document.getElementById('mouvement_quantite').value);
             const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
             if (!p || isNaN(qteMvt) || qteMvt <= 0) return;
 
+            // VÉRIFICATION ANTI-STOCK NÉGATIF
+            if (type === 'SORTIE' && qteMvt > p.quantite) {
+                montrerNotification(`Stock insuffisant. Stock disponible : ${p.quantite}`, true);
+                return;
+            }
+
             let nouvelleQuantite = type === 'ENTREE' ? p.quantite + qteMvt : p.quantite - qteMvt;
-            if (nouvelleQuantite < 0) nouvelleQuantite = 0;
 
             const data = {
                 reference: p.reference,
@@ -716,12 +730,18 @@
 
         function modifierPieceComplete(e) {
             e.preventDefault();
-            const p = toutesLesPieces.find(item => item.id === idPieceEnCours);
+            const qteActuelle = parseInt(document.getElementById('mod_quantite').value);
+            
+            if (qteActuelle < 0) {
+                montrerNotification("Le stock ne peut pas être négatif.", true);
+                return;
+            }
+
             const data = {
                 reference: document.getElementById('mod_reference').value,
                 nom: document.getElementById('mod_nom').value,
                 emplacement: document.getElementById('mod_emplacement').value,
-                quantite: parseInt(document.getElementById('mod_quantite').value),
+                quantite: qteActuelle,
                 seuil_alerte: parseInt(document.getElementById('mod_seuil_alerte').value),
                 fournisseur_id: document.getElementById('mod_fournisseur_id').value || null
             };

@@ -132,6 +132,11 @@ async function chargerPieces() {
         const res = await fetch('/api/pieces');
         const pieces = await res.json();
         
+        // Tri alphabétique croissant par nom de pièce (A à Z)
+        pieces.sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }));
+
+        toutesLesPieces = pieces; // Garde une référence globale si besoin pour tes filtres
+        
         const tbody = document.getElementById('pieces-list');
         tbody.innerHTML = '';
 
@@ -155,8 +160,8 @@ async function chargerPieces() {
             `;
             tbody.appendChild(tr);
         });
-    } catch (err) {
-        console.error('Erreur chargement pièces', err);
+    } catch (error) {
+        console.error("Erreur lors du chargement des pièces:", error);
     }
 }
 
