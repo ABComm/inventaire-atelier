@@ -188,28 +188,61 @@ async function chargerPieces() {
     }
 }
 
-// Charger l'historique des mouvements
-async function chargerMouvements() {
-    try {
-        const res = await fetch('/api/mouvements');
-        const mouvements = await res.json();
+function afficherHistorique() {
+    const historiqueContainer = document.getElementById('listeHistorique'); // Remplacez par l'ID réel de votre conteneur
+    if (!historiqueContainer) return;
 
-        const tbody = document.getElementById('mouvements-list');
-        if (!tbody) return;
-        tbody.innerHTML = '';
+    let html = '';
 
-        mouvements.forEach(m => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="Date" style="color: #64748b; font-size: 13px;">${m.date}</td>
-                <td data-label="Type"><strong>${m.type}</strong></td>
-                <td data-label="Détails">${m.details}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error('Erreur chargement mouvements', err);
+    // Vérification si le tableau des mouvements existe
+    const mouvements = window.tousLesMouvements || [];
+
+    if (mouvements.length === 0) {
+        historiqueContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 15px;">Aucun historique enregistré.</p>';
+        return;
     }
+
+    mouvements.forEach(m => {
+        // Recherche souple de la pièce (gère les IDs numériques et textuels)
+        const piece = toutesLesPieces.find(p => p.id == m.pieceId || p.id == m.id_piece || p.reference === m.reference);
+        const nomPiece = piece ? `${piece.reference} - ${piece.nom}` : 'Pièce introuvable';
+
+        // Formatage de la quantité / valeur
+        const quantiteBrute = m.quantite !== undefined ? m.quantite : (m.valeur || 0);
+        const signe = quantiteBrute > 0 ? '+' : '';
+        const affichageQuantite = `${signe}${quantiteBrute}`;
+        const couleurQuantite = quantiteBrute >= 0 ? 'color: var(--success, #28a745);' : 'color: var(--danger, #dc3545);';
+
+        // Formatage sécurisé de la date
+        let dateFormatee = 'Date non disponible';
+        if (m.date || m.date_creation || m.timestamp) {
+            const dateObj = new Date(m.date || m.date_creation || m.timestamp);
+            if (!isNaN(dateObj.getTime())) {
+                dateFormatee = dateObj.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        html += `
+            <div class="historique-item" style="padding: 12px; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>${nomPiece}</strong>
+                    <span style="${couleurQuantite} font-weight: bold;">${affichageQuantite}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #64748b; margin-top: 4px;">
+                    <span>Type: ${m.type || 'MODIFICATION'}</span>
+                    <span>${dateFormatee}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    historiqueContainer.innerHTML = html;
 }
 
 // Modifier la quantité
